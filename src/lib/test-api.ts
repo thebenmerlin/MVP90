@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable import/no-anonymous-default-export */
 // API Endpoint Testing Script
 // Run this to verify all mock endpoints return valid JSON
 
@@ -124,7 +127,7 @@ export function printTestResults(results: TestResult[]): void {
   console.log(`\n📊 Test Results Summary:`);
   console.log(`✅ Successful: ${successCount}/${results.length}`);
   console.log(`❌ Failed: ${errorCount}/${results.length}`);
-  console.log(`⏱️  Average Response Time: ${Math.round(results.reduce((sum, r) => sum + r.responseTime, 0) / results.length)}ms\n`);
+  console.log(`⏱️ Average Response Time: ${Math.round(results.reduce((sum, r) => sum + r.responseTime, 0) / results.length)}ms\n`);
   
   // Print detailed results
   results.forEach(result => {
@@ -134,17 +137,17 @@ export function printTestResults(results: TestResult[]): void {
     console.log(`${status} ${result.endpoint} (${time})`);
     
     if (result.error) {
-      console.log(`   Error: ${result.error}`);
+      console.log(`  Error: ${result.error}`);
     }
     
     if (result.data && result.status === 'success') {
       // Show sample of returned data
       if (result.endpoint.includes('/api/metrics/')) {
-        console.log(`   Metric: ${result.data.metric} = ${result.data.value} ${result.data.unit || ''}`);
+        console.log(`  Metric: ${result.data.metric} = ${result.data.value} ${result.data.unit || ''}`);
       } else if (result.endpoint.includes('/api/signal_meta/')) {
-        console.log(`   Entity: ${result.data.entity_name} (${result.data.source_metadata.length} sources)`);
+        console.log(`  Entity: ${result.data.entity_name} (${result.data.source_metadata.length} sources)`);
       } else if (result.endpoint.includes('/api/score_breakdown/')) {
-        console.log(`   Score: ${result.data.score_name} = ${result.data.value} (${result.data.percentile}th percentile)`);
+        console.log(`  Score: ${result.data.score_name} = ${result.data.value} (${result.data.percentile}th percentile)`);
       }
     }
     
@@ -160,7 +163,7 @@ export async function runApiTests(): Promise<void> {
     
     const hasErrors = results.some(r => r.status === 'error');
     if (hasErrors) {
-      console.log('⚠️  Some endpoints failed. Check the errors above.');
+      console.log('⚠️ Some endpoints failed. Check the errors above.');
       process.exit(1);
     } else {
       console.log('🎉 All API endpoints are working correctly!');
