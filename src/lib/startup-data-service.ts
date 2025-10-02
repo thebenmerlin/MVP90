@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // MVP90 Terminal - Startup Data Integration Service
-// Combines real API data with existing mock data structure
+import { GitHubService, ProductHuntService, SupabaseService, MetricsCalculator } from './api-services';
 
 export interface StartupSignal {
   id: number;
@@ -23,7 +23,6 @@ export interface StartupSignal {
   };
   actionTag: "Build" | "Scout" | "Store";
   lastUpdated: string;
-  // Enhanced fields for real API integration
   githubUsername?: string;
   productHuntSlug?: string;
   websiteUrl?: string;
@@ -41,7 +40,7 @@ const startupConfigs = [
     source: "GitHub",
     team: "Ex-Neuralink engineers",
     founderBackground: "PhD in Neuroscience, Stanford",
-    githubUsername: "octocat", // Using octocat as example - replace with real usernames
+    githubUsername: "octocat",
     productHuntSlug: "neurolink-ai",
     websiteUrl: "https://neurolink-ai.com",
     actionTag: "Build" as const,
@@ -57,7 +56,7 @@ const startupConfigs = [
     source: "ProductHunt",
     team: "IIT Delhi alumni",
     founderBackground: "Agricultural Engineering, 10+ years farming",
-    githubUsername: "defunkt", // Example username
+    githubUsername: "defunkt",
     productHuntSlug: "cropsense",
     websiteUrl: "https://cropsense.in",
     actionTag: "Scout" as const,
@@ -73,7 +72,7 @@ const startupConfigs = [
     source: "Reddit",
     team: "Ex-IBM Quantum team",
     founderBackground: "PhD Quantum Computing, MIT",
-    githubUsername: "pjhyett", // Example username
+    githubUsername: "pjhyett",
     productHuntSlug: "quantumsecure",
     websiteUrl: "https://quantumsecure.com",
     actionTag: "Store" as const,
@@ -89,7 +88,7 @@ const startupConfigs = [
     source: "Twitter",
     team: "Healthcare + Blockchain experts",
     founderBackground: "MD + Computer Science, AIIMS",
-    githubUsername: "mojombo", // Example username
+    githubUsername: "mojombo",
     actionTag: "Build" as const,
     estimatedBuildCost: 120000,
     indiaMarketFit: 8
@@ -103,7 +102,7 @@ const startupConfigs = [
     source: "GitHub",
     team: "Ex-Amazon logistics team",
     founderBackground: "Operations Research, Wharton MBA",
-    githubUsername: "wycats", // Example username
+    githubUsername: "wycats",
     actionTag: "Scout" as const,
     estimatedBuildCost: 90000,
     indiaMarketFit: 7
@@ -113,7 +112,7 @@ const startupConfigs = [
 export class StartupDataService {
   private cache: Map<number, StartupSignal> = new Map();
   private cacheExpiry: Map<number, number> = new Map();
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly CACHE_DURATION = 5 * 60 * 1000;
 
   async getStartupSignals(): Promise<StartupSignal[]> {
     const signals: StartupSignal[] = [];
@@ -124,7 +123,6 @@ export class StartupDataService {
         signals.push(signal);
       } catch (error) {
         console.error(`Error fetching data for ${config.name}:`, error);
-        // Fall back to basic config data
         signals.push(this.createFallbackSignal(config));
       }
     }
@@ -145,7 +143,6 @@ export class StartupDataService {
   }
 
   private async getEnhancedStartupData(config: any): Promise<StartupSignal> {
-    // Check cache first
     const cached = this.cache.get(config.id);
     const cacheTime = this.cacheExpiry.get(config.id) || 0;
     
@@ -153,7 +150,7 @@ export class StartupDataService {
       return cached;
     }
 
-    // For deployment, use mock data
+    // For now, just use mock data to avoid build issues
     const signal: StartupSignal = {
       id: config.id,
       name: config.name,
@@ -180,7 +177,6 @@ export class StartupDataService {
       realTimeData: false
     };
 
-    // Cache the result
     this.cache.set(config.id, signal);
     this.cacheExpiry.set(config.id, Date.now() + this.CACHE_DURATION);
 
@@ -225,20 +221,17 @@ export class StartupDataService {
     return `${minutes} min ago`;
   }
 
-  // Method to refresh cache for a specific startup
   async refreshStartupData(id: number): Promise<StartupSignal | null> {
     this.cache.delete(id);
     this.cacheExpiry.delete(id);
     return this.getStartupById(id);
   }
 
-  // Method to clear all cache
   clearCache(): void {
     this.cache.clear();
     this.cacheExpiry.clear();
   }
 
-  // Method to get cache status
   getCacheStatus(): { cached: number; total: number } {
     const now = Date.now();
     const validCached = Array.from(this.cacheExpiry.entries())
@@ -251,6 +244,5 @@ export class StartupDataService {
   }
 }
 
-// Export singleton instance
 export const startupDataService = new StartupDataService();
 export default startupDataService;
