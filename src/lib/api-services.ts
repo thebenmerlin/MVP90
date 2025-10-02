@@ -1,45 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextRequest, NextResponse } from 'next/server';
+// Initialize services
+export const githubService = new GitHubService();
+export const productHuntService = new ProductHuntService();
+export const supabaseService = new SupabaseService();
 
-// Mock data for the 26 Dive metrics (fallback when APIs not configured)
-const mockMetrics: Record<string, any> = {
-  // All your existing mock metrics data stays the same
-  github_activity_level: {
-    metric: 'github_activity_level',
-    value: 847,
-    type: 'number',
-    unit: 'commits',
-    description: 'Total commits and contributions across repositories',
-    timestamp: new Date().toISOString(),
-    source: 'GitHub API (Mock)'
-  },
-  // ... rest of your mock metrics
+// Utility function to check if APIs are configured
+export function getApiStatus() {
+  return {
+    github: !!process.env.GITHUB_TOKEN,
+    productHunt: !!process.env.PRODUCTHUNT_TOKEN,
+    supabase: !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    openRouter: !!process.env.OPENROUTER_API_KEY
+  };
+}
+
+// Make sure getApiStatus is exported in the default export too
+export default {
+  githubService,
+  productHuntService,
+  supabaseService,
+  MetricsCalculator,
+  getApiStatus
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ metricName: string }> }
-) {
-  try {
-    const { metricName } = await params;
-    
-    // For deployment, just use mock data
-    const metricData = mockMetrics[metricName];
-    
-    if (!metricData) {
-      return NextResponse.json(
-        { error: 'Metric not found', available_metrics: Object.keys(mockMetrics) },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(metricData, { status: 200 });
-  } catch (error) {
-    console.error('Error fetching metric:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+// Add this line to ensure getApiStatus is properly exported
+export { getApiStatus };
