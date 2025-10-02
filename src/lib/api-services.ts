@@ -21,6 +21,3 @@ export default {
   MetricsCalculator,
   getApiStatus
 };
-
-// Add this line to ensure getApiStatus is properly exported
-export { getApiStatus };
