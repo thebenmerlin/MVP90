@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import KeyboardShortcutsProvider from "@/components/mvp90/KeyboardShortcutsProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen bg-background font-mono antialiased">
-        {children}
+        <KeyboardShortcutsProvider>
+          {children}
+        </KeyboardShortcutsProvider>
       </body>
     </html>
   );
