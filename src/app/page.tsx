@@ -56,40 +56,42 @@ const TerminalPage = () => {
   return (
     <div className="flex h-screen bg-background text-foreground dark">
       {/* Left sidebar navigation */}
-      <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col">
-        <div className="p-6 border-b border-sidebar-border">
-          <h1 className="text-xl font-bold text-sidebar-foreground">MVP90 Terminal</h1>
-          <p className="text-sm text-sidebar-foreground/70 mt-1">Venture Intelligence Platform</p>
+      <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
+        <div className="p-4 border-b border-sidebar-border">
+          <h1 className="text-lg font-bold text-sidebar-foreground uppercase tracking-widest">MVP90 Terminal</h1>
+          <p className="text-xs text-sidebar-foreground/70 mt-1">Venture Intelligence Platform</p>
           {authenticated && (
-            <div className="mt-3 text-xs text-sidebar-foreground/60">
+            <div className="mt-2 text-xs text-sidebar-foreground/60 border-t border-sidebar-border/50 pt-2">
               Role: {userRole}
             </div>
           )}
         </div>
         
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
+        <nav className="flex-1 p-2">
+          <div className="space-y-1">
             {modules.map((module) => (
               <button
                 key={module.key}
                 onClick={() => setCurrentModule(module.key)}
-                className={`w-full p-3 text-left rounded-lg transition-colors ${
+                className={`w-full p-2 text-left transition-colors flex justify-between items-center ${
                   currentModule === module.key
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground border-l-2 border-primary"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 border-l-2 border-transparent"
                 }`}
               >
-                <div className="font-medium">{module.name}</div>
-                <div className="text-xs text-sidebar-foreground/60 mt-1">{module.description}</div>
+                <div>
+                  <div className="font-bold text-xs uppercase">{module.name}</div>
+                  <div className="text-[10px] text-sidebar-foreground/60">{module.description}</div>
+                </div>
               </button>
             ))}
           </div>
         </nav>
 
-        <div className="p-4 border-t border-sidebar-border">
+        <div className="p-2 border-t border-sidebar-border">
           <button
             onClick={() => setAuthenticated(false)}
-            className="w-full p-2 text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
+            className="w-full p-2 text-xs font-bold uppercase text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             Logout
           </button>
@@ -98,23 +100,23 @@ const TerminalPage = () => {
 
       {/* Main content area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-card border-b border-border p-4">
+        <header className="bg-card border-b border-border p-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">
+            <div className="flex items-center gap-3">
+              <h2 className="text-md font-bold uppercase tracking-wide">
                 {modules.find(m => m.key === currentModule)?.name || "Dashboard"}
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground hidden md:inline">
                 {modules.find(m => m.key === currentModule)?.description || "Select a module"}
-              </p>
+              </span>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs text-muted-foreground font-mono">
               {new Date().toLocaleString()}
             </div>
           </div>
         </header>
         
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-4 overflow-auto bg-background">
           {renderModule()}
         </div>
       </main>
