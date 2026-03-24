@@ -32,9 +32,10 @@ interface StartupProfileViewProps {
   startup: StartupSignal;
   onClose: () => void;
   userRole: string;
+  isPanel?: boolean;
 }
 
-const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClose, userRole }) => {
+const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClose, userRole, isPanel = false }) => {
   const [activeTab, setActiveTab] = useState<"overview" | "scoring" | "traction" | "analysis" | "dive">("overview");
   const [notes, setNotes] = useState("");
   const [savedToWatchlist, setSavedToWatchlist] = useState(false);
@@ -75,11 +76,10 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
     { key: "dive", name: "Dive" }
   ];
 
-  return (
-    <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
-      <div className="bg-card border border-border rounded-lg w-4/5 max-w-4xl h-4/5 shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+  const content = (
+    <div className={`bg-card w-full flex flex-col font-mono ${isPanel ? 'h-full border-l border-border' : 'border border-border rounded-lg w-4/5 max-w-4xl h-4/5 shadow-2xl'}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/20">
           <div className="flex items-center space-x-4">
             <div>
               <div className="flex items-center space-x-2">
@@ -488,25 +488,34 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
           {activeTab === "dive" && (
             <DiveModule entityId={startup.id} entityName={startup.name} />
           )}
-        </div>
-
-        {/* Modals */}
-        <RawSignalBreakdownModal
-          isOpen={showRawSignalModal}
-          onClose={() => setShowRawSignalModal(false)}
-          entityId={startup.id}
-          entityName={startup.name}
-        />
-
-        <ScoreExplainerModal
-          isOpen={showScoreModal}
-          onClose={() => setShowScoreModal(false)}
-          entityId={startup.id}
-          entityName={startup.name}
-          scoreName={selectedScore.name}
-          currentValue={selectedScore.value}
-        />
       </div>
+
+      {/* Modals */}
+      <RawSignalBreakdownModal
+        isOpen={showRawSignalModal}
+        onClose={() => setShowRawSignalModal(false)}
+        entityId={startup.id}
+        entityName={startup.name}
+      />
+
+      <ScoreExplainerModal
+        isOpen={showScoreModal}
+        onClose={() => setShowScoreModal(false)}
+        entityId={startup.id}
+        entityName={startup.name}
+        scoreName={selectedScore.name}
+        currentValue={selectedScore.value}
+      />
+    </div>
+  );
+
+  if (isPanel) {
+    return content;
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
+      {content}
     </div>
   );
 };

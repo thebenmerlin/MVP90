@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import TerminalSparkline from "./TerminalSparkline";
 
 interface DiveModuleProps {
   entityId: number;
@@ -195,28 +196,15 @@ const DiveModule: React.FC<DiveModuleProps> = ({ entityId, entityName }) => {
     switch (metricName) {
       case 'weekly_signal_velocity_score':
         return (
-          <div className="h-32 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#666' }} />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1a1a1a', 
-                    border: '1px solid #333', 
-                    borderRadius: '0px',
-                    fontSize: '11px'
-                  }} 
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#00ff88" 
-                  strokeWidth={1} 
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="pt-2">
+            <TerminalSparkline
+              data={data.map((d: any) => ({ date: d.week, value: d.value }))}
+              type="area"
+              color="#00ff00"
+              height={80}
+              title="Velocity Trend"
+              showAxes={true}
+            />
           </div>
         );
 
@@ -243,32 +231,15 @@ const DiveModule: React.FC<DiveModuleProps> = ({ entityId, entityName }) => {
 
       case 'github_stars_count':
         return (
-          <div className="h-32 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data.slice(0, 15)}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#666' }} />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1a1a1a', 
-                    border: '1px solid #333', 
-                    borderRadius: '0px',
-                    fontSize: '11px'
-                  }}
-                  formatter={(value: any, name: string) => [
-                    `${value} stars`,
-                    name === 'stars' ? 'Total Stars' : name
-                  ]}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="stars" 
-                  stroke="#4f46e5" 
-                  strokeWidth={1} 
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="pt-2">
+            <TerminalSparkline
+              data={data.map((d: any) => ({ date: d.day, value: d.stars }))}
+              type="line"
+              color="#00ff00"
+              height={100}
+              title="Star Growth"
+              showAxes={true}
+            />
           </div>
         );
 
