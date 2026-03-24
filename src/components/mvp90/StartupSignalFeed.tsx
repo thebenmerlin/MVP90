@@ -6,6 +6,7 @@ import StartupProfileView from "./StartupProfileView";
 import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import { startupDataService, StartupSignal } from "@/lib/startup-data-service";
 import { getApiStatus } from "@/lib/api-services";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 interface StartupSignalFeedProps {
   userRole: string;
@@ -104,8 +105,9 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-border pb-2">
+    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs overflow-hidden">
+      <Panel defaultSize={selectedSignal ? 45 : 100} minSize={30} className="flex flex-col h-full overflow-y-auto pr-2 space-y-4 relative">
+        <div className="flex items-center justify-between border-b border-border pb-2">
         <div>
           <h2 className="text-lg font-bold uppercase tracking-wider">Startup Signal Feed</h2>
           <p className="text-xs text-muted-foreground font-mono mt-1">
@@ -361,23 +363,32 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
         </div>
       )}
 
-      {/* Startup Profile Modal */}
-      {selectedSignal && (
-        <StartupProfileView 
-          startup={selectedSignal} 
-          onClose={() => setSelectedSignal(null)}
-          userRole={userRole}
+        {/* Raw Signal Breakdown Modal */}
+        <RawSignalBreakdownModal
+          isOpen={showRawSignalModal}
+          onClose={() => setShowRawSignalModal(false)}
+          entityId={selectedSignalId}
+          entityName={signals.find(s => s.id === selectedSignalId)?.name || ''}
         />
-      )}
+      </Panel>
 
-      {/* Raw Signal Breakdown Modal */}
-      <RawSignalBreakdownModal
-        isOpen={showRawSignalModal}
-        onClose={() => setShowRawSignalModal(false)}
-        entityId={selectedSignalId}
-        entityName={signals.find(s => s.id === selectedSignalId)?.name || ''}
-      />
-    </div>
+      {selectedSignal && (
+        <>
+          <PanelResizeHandle className="w-1 bg-border hover:bg-primary cursor-col-resize transition-colors flex items-center justify-center z-10 mx-2">
+            <div className="h-10 w-0.5 bg-primary/50 pointer-events-none" />
+          </PanelResizeHandle>
+
+          <Panel defaultSize={55} minSize={40} className="h-full bg-background overflow-hidden flex flex-col pl-2">
+            <StartupProfileView
+              startup={selectedSignal}
+              onClose={() => setSelectedSignal(null)}
+              userRole={userRole}
+              isPanel={true}
+            />
+          </Panel>
+        </>
+      )}
+    </PanelGroup>
   );
 };
 
