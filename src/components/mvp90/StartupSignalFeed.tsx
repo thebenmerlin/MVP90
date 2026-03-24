@@ -30,6 +30,66 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
   const [apiStatus, setApiStatus] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
 
+  // Track recently updated signals for blinking effect
+  const [blinkingSignals, setBlinkingSignals] = useState<Record<number, string>>({});
+
+  // Establish SSE connection for live updates
+  useEffect(() => {
+    const sse = new EventSource('/api/live-signals');
+
+    sse.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type === 'connected') return;
+
+        setSignals((prevSignals) => prevSignals.map(sig => {
+          if (sig.id === payload.id) {
+            let updatedSignal = { ...sig };
+
+            if (payload.metric === 'noveltyScore') {
+              const newScore = Math.max(0, Math.min(10, sig.noveltyScore + parseFloat(payload.valueChange)));
+              updatedSignal.noveltyScore = parseFloat(newScore.toFixed(1));
+            } else if (payload.metric === 'estimatedBuildCost') {
+              updatedSignal.estimatedBuildCost = Math.max(1000, sig.estimatedBuildCost + payload.valueChange);
+            } else if (payload.metric === 'traction') {
+               updatedSignal.tractionSignals = {
+                 ...sig.tractionSignals,
+                 githubStars: sig.tractionSignals.githubStars + payload.valueChange
+               };
+            }
+
+            // Mark as live data updated
+            updatedSignal.realTimeData = true;
+
+            // Trigger blink effect for this signal ID
+            setBlinkingSignals((prev) => ({ ...prev, [payload.id]: payload.metric }));
+
+            // Clear blink after 1.5 seconds
+            setTimeout(() => {
+              setBlinkingSignals((prev) => {
+                const newState = { ...prev };
+                delete newState[payload.id];
+                return newState;
+              });
+            }, 1500);
+
+            // Update selectedSignal if it's the one currently open
+            if (selectedSignal?.id === payload.id) {
+              setSelectedSignal(updatedSignal);
+            }
+
+            return updatedSignal;
+          }
+          return sig;
+        }));
+      } catch (err) {
+        console.error("SSE parsing error", err);
+      }
+    };
+
+    return () => sse.close();
+  }, [selectedSignal]);
+
   // Load startup signals on component mount
   useEffect(() => {
     loadStartupSignals();
@@ -321,7 +381,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
               </div>
 
               <div className="grid grid-cols-4 gap-2 text-xs border-t border-border pt-2 mt-2">
-                <div className="text-left border-r border-border pr-2">
+                <div className={`text-left border-r border-border pr-2 transition-colors duration-1000 ${blinkingSignals[signal.id] === 'noveltyScore' ? 'bg-primary/20' : ''}`}>
                   <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Novelty</div>
                   <div className={`font-mono text-sm ${getScoreColor(signal.noveltyScore)}`}>
                     {signal.noveltyScore.toFixed(1)}/10
@@ -339,7 +399,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
                     {signal.indiaMarketFit.toFixed(1)}/10
                   </div>
                 </div>
-                <div className="text-right pl-2">
+                <div className={`text-right pl-2 transition-colors duration-1000 ${blinkingSignals[signal.id] === 'estimatedBuildCost' ? 'bg-primary/20' : ''}`}>
                   <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Build Cost</div>
                   <div className="font-mono text-sm text-foreground">
                     ${(signal.estimatedBuildCost / 1000).toFixed(0)}K

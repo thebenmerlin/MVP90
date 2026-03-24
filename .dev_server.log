@@ -11,11 +11,13 @@
 - Network:       http://192.168.0.2:8000
 
 ✓ Starting...
-✓ Ready in 3s
+✓ Ready in 4s
 ○ Compiling / ...
 Supabase not configured - using mock data
- GET / 200 in 15.4s (compile: 14.5s, render: 890ms)
+ GET / 200 in 14.2s (compile: 13.2s, render: 949ms)
+ GET /api/live-signals 200 in 9.0s (compile: 1231ms, render: 7.8s)
 Persisting failed: Unable to write SST file 00000037.sst
 
 Caused by:
     No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
