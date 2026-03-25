@@ -1,5 +1,11 @@
 export const dynamic = 'force-dynamic';
 
+interface SignalUpdatePayload {
+  id: number;
+  metric?: 'noveltyScore' | 'estimatedBuildCost' | 'traction';
+  valueChange?: string | number;
+}
+
 export async function GET() {
   const encoder = new TextEncoder();
 
