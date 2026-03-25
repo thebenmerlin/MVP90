@@ -165,7 +165,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
   };
 
   return (
-    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs overflow-y-auto">
+    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs">
       <Panel defaultSize={selectedSignal ? 45 : 100} minSize={30} className="flex flex-col h-full overflow-y-auto pr-2 space-y-4 relative">
         <div className="flex items-center justify-between border-b border-border pb-2">
         <div>
