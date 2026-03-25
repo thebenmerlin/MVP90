@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { sanitizeUrl } from "@/lib/utils";
 
 interface RawSignalBreakdownModalProps {
   isOpen: boolean;
@@ -256,7 +257,7 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
                 {signalData.associated_links.map((link, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <a
-                      href={link}
+                      href={sanitizeUrl(link)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-blue-400 hover:text-blue-300 truncate flex-1"
