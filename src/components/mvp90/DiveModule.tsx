@@ -122,23 +122,36 @@ const DiveModule: React.FC<DiveModuleProps> = ({ entityId, entityName }) => {
   const loadMetricsForGroup = async (groupKey: string) => {
     const groupMetrics = METRIC_GROUPS[groupKey as keyof typeof METRIC_GROUPS];
     
-    for (const metricName of groupMetrics) {
-      if (metrics[metricName]) continue; // Already loaded
-      
-      setLoading(prev => ({ ...prev, [metricName]: true }));
-      
-      try {
-        const response = await fetch(`/api/metrics/${metricName}`);
-        if (response.ok) {
-          const data = await response.json();
-          setMetrics(prev => ({ ...prev, [metricName]: data }));
-        }
-      } catch (error) {
-        console.error(`Failed to load metric ${metricName}:`, error);
-      } finally {
-        setLoading(prev => ({ ...prev, [metricName]: false }));
+    // Find metrics that aren't loaded yet
+    const metricsToLoad = groupMetrics.filter(metricName => !metrics[metricName]);
+
+    if (metricsToLoad.length === 0) return; // All already loaded
+
+    // Set loading state for all metrics being fetched
+    setLoading(prev => {
+      const newLoading = { ...prev };
+      for (const metricName of metricsToLoad) {
+        newLoading[metricName] = true;
       }
-    }
+      return newLoading;
+    });
+
+    // Fetch all metrics concurrently
+    await Promise.all(
+      metricsToLoad.map(async (metricName) => {
+        try {
+          const response = await fetch(`/api/metrics/${metricName}`);
+          if (response.ok) {
+            const data = await response.json();
+            setMetrics(prev => ({ ...prev, [metricName]: data }));
+          }
+        } catch (error) {
+          console.error(`Failed to load metric ${metricName}:`, error);
+        } finally {
+          setLoading(prev => ({ ...prev, [metricName]: false }));
+        }
+      })
+    );
   };
 
   // Load chart data for visualization metrics
