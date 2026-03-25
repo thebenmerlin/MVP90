@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 interface VCDeal {
   id: number;
@@ -244,9 +244,9 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
     });
   };
 
-  const industries = [...new Set(deals.map(deal => deal.industry))];
-  const geographies = [...new Set(deals.map(deal => deal.geography))];
-  const stages = [...new Set(deals.map(deal => deal.stage))];
+  const industries = useMemo(() => [...new Set(deals.map(deal => deal.industry))], [deals]);
+  const geographies = useMemo(() => [...new Set(deals.map(deal => deal.geography))], [deals]);
+  const stages = useMemo(() => [...new Set(deals.map(deal => deal.stage))], [deals]);
 
   return (
     <div className="space-y-6">
