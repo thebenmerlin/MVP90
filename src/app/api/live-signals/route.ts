@@ -1,5 +1,11 @@
 export const dynamic = 'force-dynamic';
 
+interface SignalUpdatePayload {
+  id: number;
+  metric?: 'noveltyScore' | 'estimatedBuildCost' | 'traction';
+  valueChange?: string | number;
+}
+
 export async function GET() {
   const encoder = new TextEncoder();
 
@@ -16,7 +22,7 @@ export async function GET() {
 
         // Randomly adjust one of the volatile metrics
         const updateType = Math.random();
-        let payload: any = { id };
+        let payload: SignalUpdatePayload = { id };
 
         if (updateType < 0.33) {
           // Update novelty score slightly (-0.2 to +0.2)
