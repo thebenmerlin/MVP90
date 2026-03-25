@@ -28,6 +28,8 @@ interface StartupSignal {
   lastUpdated: string;
 }
 
+type TabKey = "overview" | "scoring" | "traction" | "analysis" | "dive";
+
 interface StartupProfileViewProps {
   startup: StartupSignal;
   onClose: () => void;
@@ -36,7 +38,7 @@ interface StartupProfileViewProps {
 }
 
 const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClose, userRole, isPanel = false }) => {
-  const [activeTab, setActiveTab] = useState<"overview" | "scoring" | "traction" | "analysis" | "dive">("overview");
+  const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [notes, setNotes] = useState("");
   const [savedToWatchlist, setSavedToWatchlist] = useState(false);
   const [showRawSignalModal, setShowRawSignalModal] = useState(false);
@@ -68,7 +70,7 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
     setShowScoreModal(true);
   };
 
-  const tabs = [
+  const tabs: { key: TabKey; name: string }[] = [
     { key: "overview", name: "Overview" },
     { key: "scoring", name: "Scoring" },
     { key: "traction", name: "Traction" },
@@ -132,7 +134,7 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => setActiveTab(tab.key)}
               className={`px-6 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
                   ? "border-b-2 border-primary text-primary"
