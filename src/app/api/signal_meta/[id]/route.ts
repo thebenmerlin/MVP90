@@ -229,17 +229,42 @@ export async function GET(
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 150));
     
-    const signalMeta = mockSignalMeta[id];
+    let signalMeta = mockSignalMeta[id];
     
     if (!signalMeta) {
-      return NextResponse.json(
-        { 
-          error: 'Signal metadata not found', 
-          available_ids: Object.keys(mockSignalMeta),
-          message: 'This entity may not have detailed signal metadata available yet.'
-        },
-        { status: 404 }
-      );
+      // Provide fallback mock data for any unknown ID to prevent 404s
+      signalMeta = {
+        id: parseInt(id),
+        entity_name: `Entity ${id}`,
+        source_metadata: [
+          {
+            source_name: 'System',
+            source_id: `sys-${id}`,
+            raw_snippet: 'Basic signal data automatically generated for this entity.',
+            crawl_ts: new Date().toISOString(),
+            confidence: 0.75
+          }
+        ],
+        ingestion_timestamp: new Date().toISOString(),
+        signal_chain: [
+          {
+            status: 'scraped',
+            timestamp: new Date().toISOString(),
+            processor: 'auto_fallback_v1'
+          }
+        ],
+        tags: ['Auto-generated'],
+        ml_classifications: [
+          {
+            category: 'status',
+            value: 'unknown',
+            confidence: 0.5
+          }
+        ],
+        associated_links: [],
+        quality_score: 0.5,
+        processing_notes: 'Fallback data generated for unknown entity.'
+      };
     }
     
     return NextResponse.json(signalMeta, { status: 200 });
