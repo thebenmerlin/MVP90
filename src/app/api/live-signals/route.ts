@@ -16,7 +16,7 @@ export async function GET() {
 
         // Randomly adjust one of the volatile metrics
         const updateType = Math.random();
-        let payload: any = { id };
+        const payload: any = { id };
 
         if (updateType < 0.33) {
           // Update novelty score slightly (-0.2 to +0.2)
