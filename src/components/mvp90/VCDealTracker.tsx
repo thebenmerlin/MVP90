@@ -430,7 +430,7 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
       {/* Deal Detail Modal */}
       {selectedDeal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-lg w-4/5 max-w-3xl max-h-4/5 shadow-2xl overflow-auto">
+          <div className="bg-card border border-border rounded-lg w-4/5 max-w-3xl max-h-4/5 shadow-2xl overflow-y-auto">
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
