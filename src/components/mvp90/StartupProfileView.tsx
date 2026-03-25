@@ -145,7 +145,7 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6 overflow-y-auto">
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div>

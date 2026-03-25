@@ -165,7 +165,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
   };
 
   return (
-    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs overflow-hidden">
+    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs overflow-y-auto">
       <Panel defaultSize={selectedSignal ? 45 : 100} minSize={30} className="flex flex-col h-full overflow-y-auto pr-2 space-y-4 relative">
         <div className="flex items-center justify-between border-b border-border pb-2">
         <div>
@@ -345,7 +345,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button
-                            onClick={(e) => {
+                            onClick={(e) => { e.preventDefault();
                               e.stopPropagation();
                               setSelectedSignalId(signal.id);
                               setShowRawSignalModal(true);
@@ -438,7 +438,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
             <div className="h-10 w-0.5 bg-primary/50 pointer-events-none" />
           </PanelResizeHandle>
 
-          <Panel defaultSize={55} minSize={40} className="h-full bg-background overflow-hidden flex flex-col pl-2">
+          <Panel defaultSize={55} minSize={40} className="h-full bg-background overflow-y-auto flex flex-col pl-2">
             <StartupProfileView
               startup={selectedSignal}
               onClose={() => setSelectedSignal(null)}
