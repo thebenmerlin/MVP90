@@ -44,7 +44,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
 
         setSignals((prevSignals) => prevSignals.map(sig => {
           if (sig.id === payload.id) {
-            let updatedSignal = { ...sig };
+            const updatedSignal = { ...sig };
 
             if (payload.metric === 'noveltyScore') {
               const newScore = Math.max(0, Math.min(10, sig.noveltyScore + parseFloat(payload.valueChange)));

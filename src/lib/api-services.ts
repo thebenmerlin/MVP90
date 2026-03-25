@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // MVP90 Terminal - Real API Integration Services
 import { createClient } from '@supabase/supabase-js';

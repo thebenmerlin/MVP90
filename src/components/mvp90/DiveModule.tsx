@@ -71,14 +71,18 @@ const generateChartData = (metricName: string) => {
         timestamp: new Date(Date.now() - (11 - i) * 7 * 24 * 60 * 60 * 1000).toISOString()
       }));
     
-    case 'producthunt_upvotes':
-      return Array.from({ length: 15 }, (_, i) => ({
-        day: i === 0 ? 'Launch' : `+${i}d`,
-        upvotes: i === 0 ? 89 : Math.max(0, 89 - Math.floor(Math.random() * 10) - i * 2),
-        cumulative: Array.from({ length: i + 1 }, (_, j) => 
-          j === 0 ? 89 : Math.max(0, 89 - Math.floor(Math.random() * 10) - j * 2)
-        ).reduce((a, b) => a + b, 0)
-      }));
+    case 'producthunt_upvotes': {
+      let cumulativeSum = 0;
+      return Array.from({ length: 15 }, (_, i) => {
+        const upvotes = i === 0 ? 89 : Math.max(0, 89 - Math.floor(Math.random() * 10) - i * 2);
+        cumulativeSum += upvotes;
+        return {
+          day: i === 0 ? 'Launch' : `+${i}d`,
+          upvotes,
+          cumulative: cumulativeSum
+        };
+      });
+    }
     
     case 'github_stars_count':
       return Array.from({ length: 30 }, (_, i) => ({
