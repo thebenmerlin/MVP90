@@ -147,7 +147,7 @@ interface VCDealTrackerProps {
 }
 
 const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
-  const [deals, setDeals] = useState<VCDeal[]>(dummyDeals);
+  const [deals] = useState<VCDeal[]>(dummyDeals);
   const [filteredDeals, setFilteredDeals] = useState<VCDeal[]>(dummyDeals);
   const [selectedDeal, setSelectedDeal] = useState<VCDeal | null>(null);
   const [filters, setFilters] = useState({
@@ -365,54 +365,52 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
         </div>
       </div>
 
-      {/* Deals List */}
-      <div className="space-y-3">
-        {filteredDeals.map((deal) => (
-          <div
-            key={deal.id}
-            className="bg-card border border-border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors"
-            onClick={() => setSelectedDeal(deal)}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <h3 className="font-semibold text-lg">{deal.startupName}</h3>
-                  <span className={`px-2 py-1 rounded text-xs ${getStageColor(deal.stage)}`}>
-                    {deal.stage}
-                  </span>
-                  <span className={`px-2 py-1 rounded text-xs border ${getConfidenceColor(deal.confidence)}`}>
-                    {deal.confidence}
-                  </span>
-                </div>
-                <p className="text-muted-foreground mb-2">{deal.description}</p>
-                <div className="text-sm text-muted-foreground">
-                  {deal.industry} • {deal.geography} • {formatDate(deal.date)}
-                </div>
+      {/* Deals Kanban List */}
+      <div className="flex overflow-x-auto gap-4 pb-4">
+        {["Seed", "Pre-Series A", "Series A", "Series B", "Series C+"].map((stageColumn) => {
+          const stageDeals = filteredDeals.filter((d) => d.stage === stageColumn);
+          if (stageDeals.length === 0) return null;
+          return (
+            <div key={stageColumn} className="min-w-[300px] flex-1 flex flex-col gap-3">
+              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wide border-b border-border pb-2">
+                <span>{stageColumn}</span>
+                <span className="text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">{stageDeals.length}</span>
               </div>
-            </div>
+              <div className="space-y-3 flex-1 overflow-y-auto">
+                {stageDeals.map((deal) => (
+                  <div
+                    key={deal.id}
+                    className="bg-card border border-border p-3 hover:bg-muted/50 cursor-pointer transition-colors shadow-sm"
+                    onClick={() => setSelectedDeal(deal)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <h3 className="font-bold text-sm truncate max-w-[180px]">{deal.startupName}</h3>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-bold uppercase border ${getConfidenceColor(deal.confidence)}`}>
+                            {deal.confidence}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{deal.description}</p>
+                      </div>
+                    </div>
 
-            <div className="grid grid-cols-4 gap-4 text-sm">
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Round Size</div>
-                <div className="font-semibold text-green-400">{deal.roundSize}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Valuation</div>
-                <div className="font-semibold">{deal.valuation}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Lead Investor</div>
-                <div className="font-semibold">{deal.leadInvestor}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Other Investors</div>
-                <div className="text-xs">
-                  {deal.otherInvestors.length > 0 ? `+${deal.otherInvestors.length} others` : "None"}
-                </div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-border pt-2">
+                      <div>
+                        <div className="text-muted-foreground uppercase tracking-wider mb-0.5">Round Size</div>
+                        <div className="font-mono text-green-400 text-xs">{deal.roundSize}</div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground uppercase tracking-wider mb-0.5">Lead</div>
+                        <div className="truncate text-xs" title={deal.leadInvestor}>{deal.leadInvestor}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredDeals.length === 0 && (

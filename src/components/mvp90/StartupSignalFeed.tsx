@@ -10,11 +10,13 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 interface StartupSignalFeedProps {
   userRole: string;
+  selectedStartupId?: string | null;
+  onSelectStartup?: (id: string | null) => void;
 }
 
-const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
+const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selectedStartupId, onSelectStartup }) => {
   const [signals, setSignals] = useState<StartupSignal[]>([]);
-  const [selectedSignal, setSelectedSignal] = useState<StartupSignal | null>(null);
+  const [internalSelectedSignal, setInternalSelectedSignal] = useState<StartupSignal | null>(null);
   const [showRawSignalModal, setShowRawSignalModal] = useState(false);
   const [selectedSignalId, setSelectedSignalId] = useState<number>(0);
   const [filters, setFilters] = useState({
@@ -24,11 +26,32 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
     minNoveltyScore: 0,
     actionTag: ""
   });
-  const [sortBy, setSortBy] = useState<"noveltyScore" | "indiaMarketFit" | "estimatedBuildCost">("noveltyScore");
+  const [sortBy, setSortBy] = useState<"name" | "noveltyScore" | "indiaMarketFit" | "estimatedBuildCost" | "lastUpdated" | "actionTag">("noveltyScore");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [apiStatus, setApiStatus] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
+
+  const selectedSignal = internalSelectedSignal;
+
+  const handleSelectSignal = (signal: StartupSignal | null) => {
+    setInternalSelectedSignal(signal);
+    if (onSelectStartup && signal) {
+      onSelectStartup(signal.id.toString());
+    } else if (onSelectStartup) {
+      onSelectStartup(null);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedStartupId && signals.length > 0) {
+      const signal = signals.find((s) => s.id.toString() === selectedStartupId);
+      if (signal && signal.id !== selectedSignal?.id) {
+        setInternalSelectedSignal(signal);
+      }
+    }
+  }, [selectedStartupId, signals, selectedSignal?.id]);
 
   // Track recently updated signals for blinking effect
   const [blinkingSignals, setBlinkingSignals] = useState<Record<number, string>>({});
@@ -75,7 +98,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
 
             // Update selectedSignal if it's the one currently open
             if (selectedSignal?.id === payload.id) {
-              setSelectedSignal(updatedSignal);
+              setInternalSelectedSignal(updatedSignal);
             }
 
             return updatedSignal;
@@ -147,7 +170,50 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
       (!filters.actionTag || signal.actionTag === filters.actionTag) &&
       (signal.noveltyScore >= filters.minNoveltyScore)
     )
-    .sort((a, b) => b[sortBy] - a[sortBy]);
+    .sort((a, b) => {
+      let aVal = a[sortBy];
+      let bVal = b[sortBy];
+      if (sortBy === "lastUpdated") {
+        aVal = new Date(a.lastUpdated).getTime() as any;
+        bVal = new Date(b.lastUpdated).getTime() as any;
+      }
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      return sortOrder === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+    });
+
+  const handleSort = (key: typeof sortBy) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("desc");
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (filteredAndSortedSignals.length === 0) return;
+
+      const currentIndex = selectedSignal
+        ? filteredAndSortedSignals.findIndex(s => s.id === selectedSignal.id)
+        : -1;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const nextIndex = Math.min(currentIndex + 1, filteredAndSortedSignals.length - 1);
+        handleSelectSignal(filteredAndSortedSignals[nextIndex]);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        handleSelectSignal(filteredAndSortedSignals[prevIndex]);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedSignal, filteredAndSortedSignals]);
 
   const getScoreColor = (score: number) => {
     if (score >= 8) return "text-green-400";
@@ -209,99 +275,6 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-black border border-border p-2">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Industry</label>
-            <select
-              value={filters.industry}
-              onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-              className="w-full p-1 border border-border bg-card text-foreground text-xs focus:border-primary focus:outline-none"
-            >
-              <option value="">ALL INDUSTRIES</option>
-              <option value="AI/ML">AI/ML</option>
-              <option value="AgTech">AGTECH</option>
-              <option value="FinTech">FINTECH</option>
-              <option value="HealthTech">HEALTHTECH</option>
-              <option value="Logistics">LOGISTICS</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Region</label>
-            <select
-              value={filters.region}
-              onChange={(e) => setFilters({ ...filters, region: e.target.value })}
-              className="w-full p-1 border border-border bg-card text-foreground text-xs focus:border-primary focus:outline-none"
-            >
-              <option value="">ALL REGIONS</option>
-              <option value="North America">NORTH AMERICA</option>
-              <option value="Asia">ASIA</option>
-              <option value="Europe">EUROPE</option>
-              <option value="Global">GLOBAL</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Source</label>
-            <select
-              value={filters.source}
-              onChange={(e) => setFilters({ ...filters, source: e.target.value })}
-              className="w-full p-1 border border-border bg-card text-foreground text-xs focus:border-primary focus:outline-none"
-            >
-              <option value="">ALL SOURCES</option>
-              <option value="GitHub">GITHUB</option>
-              <option value="ProductHunt">PRODUCTHUNT</option>
-              <option value="Reddit">REDDIT</option>
-              <option value="Twitter">TWITTER</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Action Tag</label>
-            <select
-              value={filters.actionTag}
-              onChange={(e) => setFilters({ ...filters, actionTag: e.target.value })}
-              className="w-full p-1 border border-border bg-card text-foreground text-xs focus:border-primary focus:outline-none"
-            >
-              <option value="">ALL ACTIONS</option>
-              <option value="Build">BUILD</option>
-              <option value="Scout">SCOUT</option>
-              <option value="Store">STORE</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1 flex justify-between">
-              <span>Min Novelty</span>
-              <span className="text-primary">{filters.minNoveltyScore}/10</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="10"
-              value={filters.minNoveltyScore}
-              onChange={(e) => setFilters({ ...filters, minNoveltyScore: parseInt(e.target.value) })}
-              className="w-full accent-primary h-1 bg-border appearance-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full p-1 border border-border bg-card text-foreground text-xs focus:border-primary focus:outline-none"
-            >
-              <option value="noveltyScore">NOVELTY SCORE</option>
-              <option value="indiaMarketFit">INDIA MARKET FIT</option>
-              <option value="estimatedBuildCost">BUILD COST</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-12 border border-border bg-black/50">
@@ -328,86 +301,123 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
         </div>
       )}
 
-      {/* Signal List */}
+      {/* Signal List High-Density Table */}
       {!isLoading && !error && (
-        <div className="space-y-2">
-          {filteredAndSortedSignals.map((signal) => (
-            <div
-              key={signal.id}
-              className="bg-card border border-border p-3 hover:bg-muted/50 cursor-pointer transition-colors group"
-              onClick={() => setSelectedSignal(signal)}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="font-bold text-sm uppercase tracking-wide group-hover:text-primary transition-colors">{signal.name}</h3>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={(e) => { e.preventDefault();
-                              e.stopPropagation();
-                              setSelectedSignalId(signal.id);
-                              setShowRawSignalModal(true);
-                            }}
-                            className="text-muted-foreground hover:text-primary transition-colors text-xs font-mono bg-black border border-border px-1"
-                            aria-label="View raw signal data"
-                          >
-                            [i]
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-[10px] uppercase font-mono">View raw signal breakdown</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <span className={`px-1 py-0.5 text-[10px] font-bold uppercase border ${getActionTagColor(signal.actionTag)}`}>
+        <div className="flex-1 overflow-auto border border-border">
+          <table className="w-full text-left border-collapse">
+            <thead className="sticky top-0 bg-black z-10 text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th
+                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  onClick={() => handleSort("name")}
+                >
+                  Name {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                </th>
+                <th className="p-2 border-b border-r border-border">
+                  <select
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    value={filters.region}
+                    onChange={(e) => setFilters({ ...filters, region: e.target.value })}
+                  >
+                    <option value="">CITY (ALL)</option>
+                    <option value="North America">NORTH AMERICA</option>
+                    <option value="Asia">ASIA</option>
+                    <option value="Europe">EUROPE</option>
+                    <option value="Global">GLOBAL</option>
+                  </select>
+                </th>
+                <th className="p-2 border-b border-r border-border">
+                  <select
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    value={filters.source}
+                    onChange={(e) => setFilters({ ...filters, source: e.target.value })}
+                  >
+                    <option value="">SOURCE (ALL)</option>
+                    <option value="GitHub">GITHUB</option>
+                    <option value="ProductHunt">PRODUCTHUNT</option>
+                    <option value="Reddit">REDDIT</option>
+                    <option value="Twitter">TWITTER</option>
+                  </select>
+                </th>
+                <th
+                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  onClick={() => handleSort("noveltyScore")}
+                >
+                  NOVELTY {sortBy === "noveltyScore" && (sortOrder === "asc" ? "↑" : "↓")}
+                </th>
+                <th
+                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  onClick={() => handleSort("indiaMarketFit")}
+                >
+                  THESIS FIT {sortBy === "indiaMarketFit" && (sortOrder === "asc" ? "↑" : "↓")}
+                </th>
+                <th
+                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  onClick={() => handleSort("lastUpdated")}
+                >
+                  AGE {sortBy === "lastUpdated" && (sortOrder === "asc" ? "↑" : "↓")}
+                </th>
+                <th className="p-2 border-b border-border">
+                  <select
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    value={filters.actionTag}
+                    onChange={(e) => setFilters({ ...filters, actionTag: e.target.value })}
+                  >
+                    <option value="">ACTION (ALL)</option>
+                    <option value="Build">BUILD</option>
+                    <option value="Scout">SCOUT</option>
+                    <option value="Store">STORE</option>
+                  </select>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAndSortedSignals.map((signal) => (
+                <tr
+                  key={signal.id}
+                  onClick={() => handleSelectSignal(signal)}
+                  className={`cursor-pointer transition-colors border-b border-border/50 hover:bg-muted/50 h-[32px] ${
+                    selectedSignal?.id === signal.id ? "bg-primary/20 hover:bg-primary/30" : ""
+                  }`}
+                >
+                  <td className="p-2 border-r border-border whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
+                    <span className="font-bold text-xs uppercase tracking-wide group-hover:text-primary transition-colors">
+                      {signal.name}
+                    </span>
+                  </td>
+                  <td className="p-2 border-r border-border whitespace-nowrap text-xs text-muted-foreground">
+                    {signal.region}
+                  </td>
+                  <td className="p-2 border-r border-border whitespace-nowrap">
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold border border-border px-1">
+                        {signal.source.substring(0, 2)}
+                      </span>
+                      {signal.realTimeData && (
+                        <span className="text-[10px] text-primary font-bold uppercase border border-primary px-1 animate-pulse">LIVE</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className={`p-2 border-r border-border text-xs font-mono transition-colors duration-1000 ${
+                    blinkingSignals[signal.id] === 'noveltyScore' ? 'bg-primary/20' : ''
+                  }`}>
+                    <span className={getScoreColor(signal.noveltyScore)}>{signal.noveltyScore.toFixed(1)}</span>
+                  </td>
+                  <td className="p-2 border-r border-border text-xs font-mono">
+                    <span className={getScoreColor(signal.indiaMarketFit)}>{signal.indiaMarketFit.toFixed(1)}</span>
+                  </td>
+                  <td className="p-2 border-r border-border text-xs text-muted-foreground whitespace-nowrap">
+                    {signal.lastUpdated.split(',')[0]}
+                  </td>
+                  <td className="p-2">
+                    <span className={`px-1 py-0.5 text-[10px] font-bold uppercase border whitespace-nowrap ${getActionTagColor(signal.actionTag)}`}>
                       {signal.actionTag}
                     </span>
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold border border-border px-1">SRC:{signal.source}</span>
-                    {signal.realTimeData && (
-                      <span className="text-[10px] text-primary font-bold uppercase border border-primary px-1 animate-pulse">LIVE</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-1">{signal.pitch}</p>
-                  <div className="text-[10px] text-muted-foreground uppercase font-mono flex items-center space-x-3">
-                    <span>TEAM: {signal.team}</span>
-                    <span>UPDATED: {signal.lastUpdated}</span>
-                    {signal.githubUsername && (
-                      <span className="text-primary">GH: {signal.githubUsername}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2 text-xs border-t border-border pt-2 mt-2">
-                <div className={`text-left border-r border-border pr-2 transition-colors duration-1000 ${blinkingSignals[signal.id] === 'noveltyScore' ? 'bg-primary/20' : ''}`}>
-                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Novelty</div>
-                  <div className={`font-mono text-sm ${getScoreColor(signal.noveltyScore)}`}>
-                    {signal.noveltyScore.toFixed(1)}/10
-                  </div>
-                </div>
-                <div className="text-left border-r border-border pr-2 pl-2">
-                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Cloneability</div>
-                  <div className={`font-mono text-sm ${getScoreColor(10 - signal.cloneabilityScore)}`}>
-                    {signal.cloneabilityScore.toFixed(1)}/10
-                  </div>
-                </div>
-                <div className="text-left border-r border-border pr-2 pl-2">
-                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">India Fit</div>
-                  <div className={`font-mono text-sm ${getScoreColor(signal.indiaMarketFit)}`}>
-                    {signal.indiaMarketFit.toFixed(1)}/10
-                  </div>
-                </div>
-                <div className={`text-right pl-2 transition-colors duration-1000 ${blinkingSignals[signal.id] === 'estimatedBuildCost' ? 'bg-primary/20' : ''}`}>
-                  <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider mb-0.5">Build Cost</div>
-                  <div className="font-mono text-sm text-foreground">
-                    ${(signal.estimatedBuildCost / 1000).toFixed(0)}K
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -441,7 +451,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole }) => {
           <Panel defaultSize={55} minSize={40} className="h-full bg-background overflow-y-auto flex flex-col pl-2">
             <StartupProfileView
               startup={selectedSignal}
-              onClose={() => setSelectedSignal(null)}
+              onClose={() => handleSelectSignal(null)}
               userRole={userRole}
               isPanel={true}
             />

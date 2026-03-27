@@ -10,6 +10,7 @@ interface ScoreExplainerModalProps {
   entityName: string;
   scoreName: string;
   currentValue: number;
+  inline?: boolean;
 }
 
 interface ScoreComponent {
@@ -50,7 +51,8 @@ const ScoreExplainerModal: React.FC<ScoreExplainerModalProps> = ({
   entityId,
   entityName,
   scoreName,
-  currentValue
+  currentValue,
+  inline = false
 }) => {
   const [scoreData, setScoreData] = useState<ScoreBreakdownData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -131,15 +133,8 @@ const ScoreExplainerModal: React.FC<ScoreExplainerModalProps> = ({
     );
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold">
-            {formatScoreName(scoreName)} - {entityName}
-          </DialogTitle>
-        </DialogHeader>
-
+  const content = (
+    <>
         {loading && (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-muted-foreground">Loading score breakdown...</div>
@@ -314,16 +309,34 @@ const ScoreExplainerModal: React.FC<ScoreExplainerModalProps> = ({
                 >
                   Copy Data
                 </button>
-                <button
-                  onClick={onClose}
-                  className="px-3 py-1 bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors"
-                >
-                  Close
-                </button>
+                {!inline && (
+                  <button
+                    onClick={onClose}
+                    className="px-3 py-1 bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors"
+                  >
+                    Close
+                  </button>
+                )}
               </div>
             </div>
           </div>
         )}
+    </>
+  );
+
+  if (inline) {
+    return <div className="font-mono">{content}</div>;
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold">
+            {formatScoreName(scoreName)} - {entityName}
+          </DialogTitle>
+        </DialogHeader>
+        {content}
       </DialogContent>
     </Dialog>
   );

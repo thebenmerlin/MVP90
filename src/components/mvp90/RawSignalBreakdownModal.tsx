@@ -9,6 +9,7 @@ interface RawSignalBreakdownModalProps {
   onClose: () => void;
   entityId: number;
   entityName: string;
+  inline?: boolean;
 }
 
 interface SourceMetadata {
@@ -48,7 +49,8 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
   isOpen,
   onClose,
   entityId,
-  entityName
+  entityName,
+  inline = false
 }) => {
   const [signalData, setSignalData] = useState<SignalMetaData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -111,15 +113,8 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
     navigator.clipboard.writeText(text);
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold">
-            Raw Signal Breakdown - {entityName}
-          </DialogTitle>
-        </DialogHeader>
-
+  const content = (
+    <>
         {loading && (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-muted-foreground">Loading signal data...</div>
@@ -298,16 +293,34 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
                 >
                   Copy JSON
                 </button>
-                <button
-                  onClick={onClose}
-                  className="px-3 py-1 bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors"
-                >
-                  Close
-                </button>
+                {!inline && (
+                  <button
+                    onClick={onClose}
+                    className="px-3 py-1 bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors"
+                  >
+                    Close
+                  </button>
+                )}
               </div>
             </div>
           </div>
         )}
+    </>
+  );
+
+  if (inline) {
+    return <div className="font-mono">{content}</div>;
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold">
+            Raw Signal Breakdown - {entityName}
+          </DialogTitle>
+        </DialogHeader>
+        {content}
       </DialogContent>
     </Dialog>
   );
