@@ -127,12 +127,25 @@ const SavedListsPanel: React.FC<SavedListsPanelProps> = ({ userRole }) => {
 
   const updatesCount = savedItems.filter(item => item.lastUpdate).length;
 
+  // Calculate mock aggregated metrics
+  const trackedStartups = savedItems.filter(i => i.type === "signal").length;
+  const avgNovelty = savedItems
+    .filter(i => i.type === "signal" && i.data?.noveltyScore)
+    .reduce((acc, curr) => acc + curr.data.noveltyScore, 0) / (trackedStartups || 1);
+
+  const deals = savedItems.filter(i => i.type === "deal");
+  const totalFunding = deals.reduce((acc, curr) => {
+    // Basic mock parsing of "$12M" to 12
+    const size = curr.data?.roundSize?.replace(/[^0-9.]/g, '');
+    return acc + (parseFloat(size) || 0);
+  }, 0);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Saved Lists & Watchlist</h2>
-          <p className="text-muted-foreground">Manage your bookmarked signals, founders, and deals</p>
+          <h2 className="text-2xl font-bold">Portfolio & Watchlist</h2>
+          <p className="text-muted-foreground">Track aggregated metrics and bookmarked startups over time</p>
         </div>
         <div className="flex items-center space-x-4">
           {updatesCount > 0 && (
@@ -143,6 +156,30 @@ const SavedListsPanel: React.FC<SavedListsPanelProps> = ({ userRole }) => {
           <div className="text-sm text-muted-foreground">
             {filteredItems.length} items
           </div>
+        </div>
+      </div>
+
+      {/* Aggregated Metrics */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Tracked Startups</div>
+          <div className="text-2xl font-bold">{trackedStartups}</div>
+          <div className="text-xs text-primary mt-2">↑ 2 this month</div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Avg Novelty Score</div>
+          <div className="text-2xl font-bold text-primary">{avgNovelty.toFixed(1)}/10</div>
+          <div className="text-xs text-muted-foreground mt-2">Across all signals</div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Tracked Funding</div>
+          <div className="text-2xl font-bold">${totalFunding}M</div>
+          <div className="text-xs text-primary mt-2">↑ $12M recent deals</div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Portfolio Health</div>
+          <div className="text-2xl font-bold text-green-400">Strong</div>
+          <div className="text-xs text-muted-foreground mt-2">3 positive signals</div>
         </div>
       </div>
 

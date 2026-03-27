@@ -6,6 +6,7 @@ import StartupSignalFeed from "@/components/mvp90/StartupSignalFeed";
 import FounderIntelligenceSearch from "@/components/mvp90/FounderIntelligenceSearch";
 import VCDealTracker from "@/components/mvp90/VCDealTracker";
 import LPDigestGenerator from "@/components/mvp90/LPDigestGenerator";
+import SavedListsPanel from "@/components/mvp90/SavedListsPanel";
 import { GlobalCommandPalette } from "@/components/mvp90/GlobalCommandPalette";
 import { Panel, PanelGroup, PanelResizeHandle, ImperativePanelHandle } from "react-resizable-panels";
 import { useRef } from "react";
@@ -32,6 +33,7 @@ const TerminalPage = () => {
   const modules = [
     { key: "Feed", name: "Feed" },
     { key: "Pipeline", name: "Pipeline" },
+    { key: "Portfolio", name: "Portfolio" },
     { key: "Founders", name: "Founders" },
     { key: "Digest", name: "Digest" },
     { key: "Thesis", name: "Thesis" },
@@ -43,6 +45,8 @@ const TerminalPage = () => {
         return <StartupSignalFeed userRole={userRole} selectedStartupId={selectedStartupId} onSelectStartup={setSelectedStartupId} />;
       case "Pipeline":
         return <VCDealTracker userRole={userRole} />;
+      case "Portfolio":
+        return <SavedListsPanel userRole={userRole} />;
       case "Founders":
         return <FounderIntelligenceSearch userRole={userRole} />;
       case "Digest":
