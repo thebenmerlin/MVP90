@@ -23,8 +23,13 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
     region: "",
     source: "",
     minNoveltyScore: 0,
+    maxCloneabilityScore: 10,
+    minIndiaMarketFit: 0,
+    maxEstimatedBuildCost: 10000000,
+    minGithubStars: 0,
     actionTag: ""
   });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"name" | "noveltyScore" | "indiaMarketFit" | "estimatedBuildCost" | "lastUpdated" | "actionTag">("noveltyScore");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -167,7 +172,11 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
       (!filters.region || signal.region === filters.region) &&
       (!filters.source || signal.source === filters.source) &&
       (!filters.actionTag || signal.actionTag === filters.actionTag) &&
-      (signal.noveltyScore >= filters.minNoveltyScore)
+      (signal.noveltyScore >= filters.minNoveltyScore) &&
+      (signal.cloneabilityScore <= filters.maxCloneabilityScore) &&
+      (signal.indiaMarketFit >= filters.minIndiaMarketFit) &&
+      (signal.estimatedBuildCost <= filters.maxEstimatedBuildCost) &&
+      (signal.tractionSignals.githubStars >= filters.minGithubStars)
     )
     .sort((a, b) => {
       let aVal = a[sortBy];
@@ -214,6 +223,17 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedSignal, filteredAndSortedSignals]);
 
+  useEffect(() => {
+    const handleF3 = (e: KeyboardEvent) => {
+      if (e.key === "F3") {
+        e.preventDefault();
+        setShowAdvancedFilters(prev => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleF3);
+    return () => window.removeEventListener("keydown", handleF3);
+  }, []);
+
   const getScoreColor = (score: number) => {
     if (score >= 8) return "text-green-400";
     if (score >= 6) return "text-yellow-400";
@@ -252,6 +272,13 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
             className="text-xs text-primary font-bold uppercase hover:bg-primary/20 p-1 border border-transparent hover:border-primary disabled:opacity-50 transition-colors"
           >
             [Refresh]
+          </button>
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className={`text-xs font-bold uppercase p-1 border transition-colors ${showAdvancedFilters ? 'bg-primary/20 text-primary border-primary' : 'text-muted-foreground border-transparent hover:border-border'}`}
+            title="Toggle Filters (F3)"
+          >
+            [Filters]
           </button>
           <div className="text-xs text-muted-foreground font-mono">
             COUNT: {filteredAndSortedSignals.length}
@@ -297,6 +324,94 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
           >
             [RETRY]
           </button>
+        </div>
+      )}
+
+      {/* Advanced Filters Panel */}
+      {showAdvancedFilters && (
+        <div className="bg-black border-b border-border p-3 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
+          <div className="space-y-1">
+            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min Novelty (0-10)</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                value={filters.minNoveltyScore}
+                onChange={(e) => setFilters({ ...filters, minNoveltyScore: parseFloat(e.target.value) })}
+                className="w-full accent-primary"
+              />
+              <span className="text-xs font-mono w-6 text-right">{filters.minNoveltyScore}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Max Cloneability (0-10)</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                value={filters.maxCloneabilityScore}
+                onChange={(e) => setFilters({ ...filters, maxCloneabilityScore: parseFloat(e.target.value) })}
+                className="w-full accent-primary"
+              />
+              <span className="text-xs font-mono w-6 text-right">{filters.maxCloneabilityScore}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min Thesis Fit (0-10)</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="0.1"
+                value={filters.minIndiaMarketFit}
+                onChange={(e) => setFilters({ ...filters, minIndiaMarketFit: parseFloat(e.target.value) })}
+                className="w-full accent-primary"
+              />
+              <span className="text-xs font-mono w-6 text-right">{filters.minIndiaMarketFit}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min GitHub Stars</label>
+            <input
+              type="number"
+              min="0"
+              value={filters.minGithubStars}
+              onChange={(e) => setFilters({ ...filters, minGithubStars: parseInt(e.target.value) || 0 })}
+              className="w-full bg-transparent border border-border p-1 text-xs font-mono outline-none focus:border-primary"
+            />
+          </div>
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Max Build Cost ($)</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="1000000"
+                step="10000"
+                value={filters.maxEstimatedBuildCost}
+                onChange={(e) => setFilters({ ...filters, maxEstimatedBuildCost: parseInt(e.target.value) })}
+                className="w-full accent-primary"
+              />
+              <span className="text-xs font-mono w-20 text-right">${(filters.maxEstimatedBuildCost / 1000).toFixed(0)}k</span>
+            </div>
+          </div>
+          <div className="md:col-span-2 flex items-end justify-end">
+             <button
+                onClick={() => setFilters({
+                  industry: "", region: "", source: "", minNoveltyScore: 0,
+                  maxCloneabilityScore: 10, minIndiaMarketFit: 0, maxEstimatedBuildCost: 10000000,
+                  minGithubStars: 0, actionTag: ""
+                })}
+                className="text-[10px] text-primary border border-primary px-3 py-1.5 hover:bg-primary/20 uppercase font-bold transition-colors"
+              >
+                [RESET ALL FILTERS]
+              </button>
+          </div>
         </div>
       )}
 
@@ -424,7 +539,11 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
         <div className="text-center py-12 border border-border bg-black/50">
           <div className="text-muted-foreground text-xs uppercase font-bold mb-2">No signals match your filters</div>
           <button
-            onClick={() => setFilters({ industry: "", region: "", source: "", minNoveltyScore: 0, actionTag: "" })}
+            onClick={() => setFilters({
+              industry: "", region: "", source: "", minNoveltyScore: 0,
+              maxCloneabilityScore: 10, minIndiaMarketFit: 0, maxEstimatedBuildCost: 10000000,
+              minGithubStars: 0, actionTag: ""
+            })}
             className="text-[10px] text-primary border border-primary px-2 py-1 hover:bg-primary/20 uppercase font-bold transition-colors"
           >
             [CLEAR FILTERS]
