@@ -335,7 +335,7 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
             <div className="flex space-x-1">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as "date" | "roundSize" | "valuation")}
                 className="flex-1 p-2 rounded border border-border bg-input text-foreground text-sm"
               >
                 <option value="date">Date</option>

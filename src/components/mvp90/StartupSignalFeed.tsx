@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import StartupProfileView from "./StartupProfileView";
 import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import { startupDataService, StartupSignal } from "@/lib/startup-data-service";
@@ -18,7 +17,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
   const [signals, setSignals] = useState<StartupSignal[]>([]);
   const [internalSelectedSignal, setInternalSelectedSignal] = useState<StartupSignal | null>(null);
   const [showRawSignalModal, setShowRawSignalModal] = useState(false);
-  const [selectedSignalId, setSelectedSignalId] = useState<number>(0);
+  const [selectedSignalId] = useState<number>(0);
   const [filters, setFilters] = useState({
     industry: "",
     region: "",
@@ -30,7 +29,7 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [apiStatus, setApiStatus] = useState<any>({});
+  const [apiStatus, setApiStatus] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
   const selectedSignal = internalSelectedSignal;
@@ -174,8 +173,8 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
       let aVal = a[sortBy];
       let bVal = b[sortBy];
       if (sortBy === "lastUpdated") {
-        aVal = new Date(a.lastUpdated).getTime() as any;
-        bVal = new Date(b.lastUpdated).getTime() as any;
+        aVal = new Date(a.lastUpdated).getTime() as unknown as typeof aVal;
+        bVal = new Date(b.lastUpdated).getTime() as unknown as typeof bVal;
       }
       if (typeof aVal === "string" && typeof bVal === "string") {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);

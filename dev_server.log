@@ -67,3 +67,5 @@ Supabase not configured - using mock data
  GET / 200 in 563ms (compile: 125ms, render: 438ms)
  GET /api/live-signals 200 in 6.4s (compile: 3ms, render: 6.4s)
  GET /api/live-signals 200 in 3.2s (compile: 3ms, render: 3.2s)
+ GET / 200 in 1023ms (compile: 229ms, render: 794ms)
+ GET /api/live-signals 200 in 7.1s (compile: 13ms, render: 7.1s)

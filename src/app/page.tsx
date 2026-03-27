@@ -7,13 +7,26 @@ import FounderIntelligenceSearch from "@/components/mvp90/FounderIntelligenceSea
 import VCDealTracker from "@/components/mvp90/VCDealTracker";
 import LPDigestGenerator from "@/components/mvp90/LPDigestGenerator";
 import { GlobalCommandPalette } from "@/components/mvp90/GlobalCommandPalette";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Panel, PanelGroup, PanelResizeHandle, ImperativePanelHandle } from "react-resizable-panels";
+import { useRef } from "react";
 
 const TerminalPage = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [currentModule, setCurrentModule] = useState<string>("Feed");
   const [userRole, setUserRole] = useState<string>("Viewer");
   const [pipelineExpanded, setPipelineExpanded] = useState<boolean>(false);
+  const pipelinePanelRef = useRef<ImperativePanelHandle>(null);
+
+  const togglePipeline = () => {
+    const panel = pipelinePanelRef.current;
+    if (panel) {
+      if (pipelineExpanded) {
+        panel.collapse();
+      } else {
+        panel.resize(50);
+      }
+    }
+  };
   const [selectedStartupId, setSelectedStartupId] = useState<string | null>(null);
 
   const modules = [
@@ -48,11 +61,11 @@ const TerminalPage = () => {
           setCurrentModule("Feed");
           setSelectedStartupId(id);
         }}
-        onSelectFounder={(id) => {
+        onSelectFounder={() => {
           setCurrentModule("Founders");
           // Add logic to select founder
         }}
-        onSelectCity={(city) => {
+        onSelectCity={() => {
           setCurrentModule("Feed");
           // Add logic to filter by city
         }}
@@ -100,7 +113,7 @@ const TerminalPage = () => {
           <Panel defaultSize={pipelineExpanded ? 50 : 95} minSize={30}>
             {/* The renderModule handles rendering either Feed, Founders, etc. */}
             {/* Inside Feed, we have another PanelGroup for left-table, right-detail pane */}
-            <div className="h-full w-full">
+            <div className="h-full w-full pl-4 pt-4 pb-0 pr-0">
                {renderModule()}
             </div>
           </Panel>
@@ -111,7 +124,7 @@ const TerminalPage = () => {
              <div className="h-full flex flex-col bg-card border-t border-border transition-all">
                 <div
                   className="flex items-center justify-between px-4 py-2 cursor-pointer bg-muted/20 border-b border-border hover:bg-muted/40"
-                  onClick={() => setPipelineExpanded(!pipelineExpanded)}
+                  onClick={togglePipeline}
                 >
                    <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
                      <span className="text-primary">{pipelineExpanded ? "▼" : "▲"}</span> PIPELINE
