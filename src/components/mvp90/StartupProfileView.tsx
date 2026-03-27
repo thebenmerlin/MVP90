@@ -42,7 +42,6 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
   const [notes, setNotes] = useState("");
   const [savedToWatchlist, setSavedToWatchlist] = useState(false);
   const [showRawSignalModal, setShowRawSignalModal] = useState(false);
-  const [showScoreModal, setShowScoreModal] = useState(false);
   const [selectedScore, setSelectedScore] = useState<{name: string, value: number}>({name: '', value: 0});
 
   const getScoreColor = (score: number) => {
@@ -67,15 +66,18 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
   const handleScoreClick = (scoreName: string, value: number) => {
     setSelectedScore({ name: scoreName, value });
-    setShowScoreModal(true);
+    setActiveTab("score_explainer");
   };
 
-  const tabs: { key: TabKey; name: string }[] = [
+  type LocalTabKey = TabKey | "raw_signal" | "score_explainer";
+
+  const tabs: { key: LocalTabKey; name: string }[] = [
     { key: "overview", name: "Overview" },
     { key: "scoring", name: "Scoring" },
     { key: "traction", name: "Traction" },
     { key: "analysis", name: "Analysis" },
-    { key: "dive", name: "Dive" }
+    { key: "dive", name: "Dive" },
+    { key: "raw_signal", name: "Raw Signal" }
   ];
 
   const content = (
@@ -148,6 +150,31 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
         {/* Content */}
         <div className="flex-1 p-6 overflow-y-auto">
+          {activeTab === "score_explainer" && selectedScore.name && (
+            <div className="space-y-6">
+              <button onClick={() => setActiveTab("scoring")} className="mb-4 text-xs text-muted-foreground hover:text-foreground">← Back to Scoring</button>
+              <ScoreExplainerModal
+                isOpen={true}
+                onClose={() => setActiveTab("scoring")}
+                entityId={startup.id}
+                entityName={startup.name}
+                scoreName={selectedScore.name}
+                currentValue={selectedScore.value}
+                inline
+              />
+            </div>
+          )}
+          {activeTab === "raw_signal" && (
+            <div className="space-y-6">
+              <RawSignalBreakdownModal
+                isOpen={true}
+                onClose={() => {}}
+                entityId={startup.id}
+                entityName={startup.name}
+                inline
+              />
+            </div>
+          )}
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div>
@@ -498,15 +525,6 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
         onClose={() => setShowRawSignalModal(false)}
         entityId={startup.id}
         entityName={startup.name}
-      />
-
-      <ScoreExplainerModal
-        isOpen={showScoreModal}
-        onClose={() => setShowScoreModal(false)}
-        entityId={startup.id}
-        entityName={startup.name}
-        scoreName={selectedScore.name}
-        currentValue={selectedScore.value}
       />
     </div>
   );

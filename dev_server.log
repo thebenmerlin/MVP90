@@ -1,0 +1,69 @@
+
+> my-app@0.1.0 dev
+> PORT=8000 next dev --turbopack
+
+⚠ `eslint` configuration in next.config.ts is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.ts options detected:
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://localhost:8000
+- Network:       http://192.168.0.2:8000
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1717ms
+○ Compiling / ...
+Supabase not configured - using mock data
+ GET / 200 in 10.3s (compile: 9.6s, render: 740ms)
+ GET /api/live-signals 200 in 31.5s (compile: 772ms, render: 30.7s)
+ GET / 200 in 87ms (compile: 5ms, render: 82ms)
+ GET /api/live-signals 200 in 31.9s (compile: 4ms, render: 31.9s)
+ GET / 200 in 71ms (compile: 5ms, render: 67ms)
+ GET /api/live-signals 200 in 40s (compile: 4ms, render: 40s)
+ GET / 200 in 63ms (compile: 6ms, render: 57ms)
+ GET /api/live-signals 200 in 40s (compile: 3ms, render: 40s)
+ GET / 200 in 65ms (compile: 7ms, render: 58ms)
+ GET /api/live-signals 200 in 40.0s (compile: 4ms, render: 40.0s)
+ GET / 200 in 75ms (compile: 9ms, render: 66ms)
+ GET /api/live-signals 200 in 40s (compile: 3ms, render: 40s)
+ GET / 200 in 59ms (compile: 3ms, render: 56ms)
+ GET /api/live-signals 200 in 11.2s (compile: 2ms, render: 11.2s)
+ GET / 200 in 70ms (compile: 5ms, render: 65ms)
+ GET /api/live-signals 200 in 34.0s (compile: 3ms, render: 34.0s)
+ GET / 200 in 184ms (compile: 7ms, render: 177ms)
+ GET /api/live-signals 200 in 4.5s (compile: 4ms, render: 4.5s)
+ GET /api/live-signals 200 in 35.6s (compile: 5ms, render: 35.6s)
+ GET / 200 in 75ms (compile: 3ms, render: 72ms)
+ GET /api/live-signals 200 in 4.2s (compile: 3ms, render: 4.2s)
+ GET /api/live-signals 200 in 5.6s (compile: 7ms, render: 5.6s)
+Supabase not configured - using mock data
+ GET / 200 in 594ms (compile: 164ms, render: 430ms)
+ GET /api/live-signals 200 in 4.2s (compile: 3ms, render: 4.2s)
+ GET /api/live-signals 200 in 32.1s (compile: 2ms, render: 32.1s)
+ GET / 200 in 76ms (compile: 4ms, render: 71ms)
+ GET /api/live-signals 200 in 4.4s (compile: 3ms, render: 4.4s)
+ GET /api/score_breakdown/12?score=originality_score 200 in 1998ms (compile: 1780ms, render: 219ms)
+ GET /api/score_breakdown/12?score=originality_score 200 in 248ms (compile: 38ms, render: 210ms)
+ GET /api/live-signals 200 in 8.8s (compile: 4ms, render: 8.8s)
+ GET / 200 in 66ms (compile: 3ms, render: 62ms)
+ GET /api/live-signals 200 in 4.3s (compile: 3ms, render: 4.3s)
+ GET /api/score_breakdown/6?score=originality_score 200 in 256ms (compile: 46ms, render: 210ms)
+ GET /api/score_breakdown/6?score=originality_score 200 in 211ms (compile: 3ms, render: 208ms)
+ GET /api/live-signals 200 in 38.7s (compile: 2ms, render: 38.7s)
+ GET / 200 in 67ms (compile: 3ms, render: 64ms)
+ GET /api/live-signals 200 in 4.2s (compile: 3ms, render: 4.2s)
+ GET /api/score_breakdown/10?score=originality_score 200 in 257ms (compile: 49ms, render: 208ms)
+ GET /api/score_breakdown/10?score=originality_score 200 in 212ms (compile: 4ms, render: 208ms)
+ GET /api/live-signals 200 in 12.0s (compile: 7ms, render: 12.0s)
+ GET / 200 in 129ms (compile: 4ms, render: 125ms)
+ GET /api/live-signals 200 in 6.4s (compile: 4ms, render: 6.4s)
+ GET /api/live-signals 200 in 3.2s (compile: 2ms, render: 3.2s)
+Supabase not configured - using mock data
+ GET / 200 in 563ms (compile: 125ms, render: 438ms)
+ GET /api/live-signals 200 in 6.4s (compile: 3ms, render: 6.4s)
+ GET /api/live-signals 200 in 3.2s (compile: 3ms, render: 3.2s)
