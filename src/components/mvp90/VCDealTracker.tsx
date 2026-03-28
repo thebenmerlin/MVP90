@@ -249,7 +249,7 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
   const stages = useMemo(() => [...new Set(deals.map(deal => deal.stage))], [deals]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full overflow-y-auto pr-4 pb-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">VC Deal Tracker</h2>

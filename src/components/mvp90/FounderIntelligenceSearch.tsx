@@ -240,7 +240,7 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full overflow-y-auto pr-4 pb-4">
       <div>
         <h2 className="text-2xl font-bold mb-2">Founder Intelligence Search</h2>
         <p className="text-muted-foreground">
