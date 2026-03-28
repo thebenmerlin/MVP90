@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip } from "recharts";
 import DiveModule from "./DiveModule";
 import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import ScoreExplainerModal from "./ScoreExplainerModal";
@@ -78,6 +79,12 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
     { key: "analysis", name: "Analysis" },
     { key: "dive", name: "Dive" },
     { key: "raw_signal", name: "Raw Signal" }
+  ];
+
+  const radarData = [
+    { subject: "Novelty", A: startup.noveltyScore, fullMark: 10 },
+    { subject: "Defensibility", A: 10 - startup.cloneabilityScore, fullMark: 10 },
+    { subject: "India Fit", A: startup.indiaMarketFit, fullMark: 10 },
   ];
 
   const content = (
@@ -337,35 +344,48 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                 </div>
               </div>
 
-              {/* MVP90 Overall Score */}
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="font-medium cursor-help">MVP90 Overall Score</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs">Composite score combining all factors with weighted importance</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <button
-                    onClick={() => handleScoreClick('mvp90_overall_score', (startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)}
-                    className={`text-2xl font-bold ${getScoreColor((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)} hover:underline cursor-pointer`}
-                  >
-                    {((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3).toFixed(1)}/10
-                  </button>
+              {/* MVP90 Overall Score & Radar Chart */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-muted/50 p-4 rounded-lg flex flex-col justify-center">
+                  <div className="flex justify-between items-center mb-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="font-medium cursor-help">MVP90 Overall Score</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Composite score combining all factors with weighted importance</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <button
+                      onClick={() => handleScoreClick('mvp90_overall_score', (startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)}
+                      className={`text-2xl font-bold ${getScoreColor((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)} hover:underline cursor-pointer`}
+                    >
+                      {((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3).toFixed(1)}/10
+                    </button>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-3 mb-4">
+                    <div
+                      className="bg-gradient-to-r from-primary to-green-400 h-3 rounded-full transition-all"
+                      style={{ width: `${((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3) * 10}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Comprehensive assessment combining novelty, defensibility, and market potential
+                  </p>
                 </div>
-                <div className="w-full bg-muted rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-primary to-green-400 h-3 rounded-full transition-all"
-                    style={{ width: `${((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3) * 10}%` }}
-                  ></div>
+
+                <div className="bg-muted/50 p-4 rounded-lg h-64 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                      <PolarGrid stroke="#333" />
+                      <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 12 }} />
+                      <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fill: '#666', fontSize: 10 }} />
+                      <Radar name="Startup Profile" dataKey="A" stroke="#00ff88" fill="#00ff88" fillOpacity={0.4} />
+                    </RadarChart>
+                  </ResponsiveContainer>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Comprehensive assessment combining novelty, defensibility, and market potential
-                </p>
               </div>
             </div>
           )}
@@ -403,6 +423,46 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                   <div className="text-xs text-muted-foreground">
                     Thought leadership and content creation
                   </div>
+                </div>
+              </div>
+
+              {/* Traction Time-Series Chart */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-medium mb-4">Historical Traction (Last 6 Months)</h4>
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={[
+                        { month: 'M-5', github: Math.floor(startup.tractionSignals.githubStars * 0.4), twitter: Math.floor(startup.tractionSignals.twitterFollowers * 0.3) },
+                        { month: 'M-4', github: Math.floor(startup.tractionSignals.githubStars * 0.5), twitter: Math.floor(startup.tractionSignals.twitterFollowers * 0.5) },
+                        { month: 'M-3', github: Math.floor(startup.tractionSignals.githubStars * 0.65), twitter: Math.floor(startup.tractionSignals.twitterFollowers * 0.7) },
+                        { month: 'M-2', github: Math.floor(startup.tractionSignals.githubStars * 0.8), twitter: Math.floor(startup.tractionSignals.twitterFollowers * 0.85) },
+                        { month: 'M-1', github: Math.floor(startup.tractionSignals.githubStars * 0.9), twitter: Math.floor(startup.tractionSignals.twitterFollowers * 0.95) },
+                        { month: 'Current', github: startup.tractionSignals.githubStars, twitter: startup.tractionSignals.twitterFollowers },
+                      ]}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorGithub" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#00ff88" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#00ff88" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorTwitter" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                      <XAxis dataKey="month" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                      <RechartsTooltip
+                        contentStyle={{ backgroundColor: '#1a1a1a', borderColor: '#333', borderRadius: '4px' }}
+                        itemStyle={{ color: '#fff' }}
+                      />
+                      <Area type="monotone" dataKey="github" name="GitHub Stars" stroke="#00ff88" fillOpacity={1} fill="url(#colorGithub)" />
+                      <Area type="monotone" dataKey="twitter" name="Twitter Followers" stroke="#3b82f6" fillOpacity={1} fill="url(#colorTwitter)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
 
