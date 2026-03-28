@@ -6,7 +6,9 @@ import StartupSignalFeed from "@/components/mvp90/StartupSignalFeed";
 import FounderIntelligenceSearch from "@/components/mvp90/FounderIntelligenceSearch";
 import VCDealTracker from "@/components/mvp90/VCDealTracker";
 import LPDigestGenerator from "@/components/mvp90/LPDigestGenerator";
+import SavedListsPanel from "@/components/mvp90/SavedListsPanel";
 import { GlobalCommandPalette } from "@/components/mvp90/GlobalCommandPalette";
+import AuditLogsPanel from "@/components/mvp90/AuditLogsPanel";
 import { Panel, PanelGroup, PanelResizeHandle, ImperativePanelHandle } from "react-resizable-panels";
 import { useRef } from "react";
 
@@ -15,6 +17,7 @@ const TerminalPage = () => {
   const [currentModule, setCurrentModule] = useState<string>("Feed");
   const [userRole, setUserRole] = useState<string>("Viewer");
   const [pipelineExpanded, setPipelineExpanded] = useState<boolean>(false);
+  const [logsExpanded, setLogsExpanded] = useState<boolean>(false);
   const pipelinePanelRef = useRef<ImperativePanelHandle>(null);
 
   const togglePipeline = () => {
@@ -32,6 +35,7 @@ const TerminalPage = () => {
   const modules = [
     { key: "Feed", name: "Feed" },
     { key: "Pipeline", name: "Pipeline" },
+    { key: "Portfolio", name: "Portfolio" },
     { key: "Founders", name: "Founders" },
     { key: "Digest", name: "Digest" },
     { key: "Thesis", name: "Thesis" },
@@ -43,6 +47,8 @@ const TerminalPage = () => {
         return <StartupSignalFeed userRole={userRole} selectedStartupId={selectedStartupId} onSelectStartup={setSelectedStartupId} />;
       case "Pipeline":
         return <VCDealTracker userRole={userRole} />;
+      case "Portfolio":
+        return <SavedListsPanel userRole={userRole} />;
       case "Founders":
         return <FounderIntelligenceSearch userRole={userRole} />;
       case "Digest":
@@ -97,8 +103,18 @@ const TerminalPage = () => {
              <div className="flex items-center gap-2 border-l border-border pl-4">
                 <span className="text-muted-foreground uppercase">{userRole}</span>
                 <button
+                  onClick={() => setLogsExpanded(!logsExpanded)}
+                  className={`text-xs uppercase font-bold tracking-wider transition-colors px-2 py-1 ${
+                    logsExpanded
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  }`}
+                >
+                  LOGS
+                </button>
+                <button
                   onClick={() => setAuthenticated(false)}
-                  className="text-muted-foreground hover:text-foreground underline decoration-muted-foreground/50"
+                  className="text-muted-foreground hover:text-foreground underline decoration-muted-foreground/50 ml-2"
                 >
                   LOGOUT
                 </button>
@@ -109,8 +125,10 @@ const TerminalPage = () => {
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-h-0 relative">
-        <PanelGroup direction="vertical">
-          <Panel defaultSize={pipelineExpanded ? 50 : 95} minSize={30}>
+        <PanelGroup direction="horizontal">
+          <Panel defaultSize={logsExpanded ? 80 : 100} minSize={50} className="flex flex-col min-h-0">
+            <PanelGroup direction="vertical">
+              <Panel defaultSize={pipelineExpanded ? 50 : 95} minSize={30}>
             {/* The renderModule handles rendering either Feed, Founders, etc. */}
             {/* Inside Feed, we have another PanelGroup for left-table, right-detail pane */}
             <div className="h-full w-full pl-4 pt-4 pb-0 pr-0">
@@ -138,19 +156,30 @@ const TerminalPage = () => {
                      </div>
                    )}
                 </div>
-                {pipelineExpanded && (
-                  <div className="flex-1 overflow-auto p-4 relative">
-                    {currentModule === "Pipeline" ? (
-                       <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs uppercase">
-                         Pipeline is already open in main view.
-                       </div>
-                    ) : (
-                       <VCDealTracker userRole={userRole} />
+                    {pipelineExpanded && (
+                      <div className="flex-1 overflow-auto p-4 relative">
+                        {currentModule === "Pipeline" ? (
+                           <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs uppercase">
+                             Pipeline is already open in main view.
+                           </div>
+                        ) : (
+                           <VCDealTracker userRole={userRole} />
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-             </div>
+                 </div>
+              </Panel>
+            </PanelGroup>
           </Panel>
+
+          {logsExpanded && (
+            <>
+              <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 cursor-col-resize z-10" />
+              <Panel defaultSize={20} minSize={15} maxSize={40}>
+                <AuditLogsPanel />
+              </Panel>
+            </>
+          )}
         </PanelGroup>
       </div>
 
