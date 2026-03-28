@@ -6,6 +6,10 @@ import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import { startupDataService, StartupSignal } from "@/lib/startup-data-service";
 import { getApiStatus } from "@/lib/api-services";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 interface StartupSignalFeedProps {
   userRole: string;
@@ -114,7 +118,10 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
       }
     };
 
-    return () => sse.close();
+
+
+
+  return () => sse.close();
   }, [selectedSignal]);
 
   // Load startup signals on component mount
@@ -249,6 +256,71 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
     }
   };
 
+const exportToCSV = () => {
+    if (filteredAndSortedSignals.length === 0) return;
+
+    const headers = [
+      "Name", "Industry", "Region", "Source", "Novelty Score",
+      "Cloneability Score", "India Market Fit", "Build Cost",
+      "Action Tag", "Last Updated", "Pitch"
+    ];
+
+    const csvContent = [
+      headers.join(","),
+      ...filteredAndSortedSignals.map(s => {
+        return [
+          `"${s.name.replace(/"/g, '""')}"`,
+          `"${s.industry}"`,
+          `"${s.region}"`,
+          `"${s.source}"`,
+          s.noveltyScore,
+          s.cloneabilityScore,
+          s.indiaMarketFit,
+          s.estimatedBuildCost,
+          `"${s.actionTag}"`,
+          `"${s.lastUpdated}"`,
+          `"${s.pitch.replace(/"/g, '""')}"`
+        ].join(",");
+      })
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    saveAs(blob, "startup_signals_export.csv");
+  };
+
+  const exportToPDF = () => {
+    if (filteredAndSortedSignals.length === 0) return;
+
+    const doc = new jsPDF('landscape');
+
+    doc.setFontSize(16);
+    doc.text('Startup Signal Feed Export', 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+    doc.text(`Filters: Industry: ${filters.industry || 'All'}, Region: ${filters.region || 'All'}, Source: ${filters.source || 'All'}, Action: ${filters.actionTag || 'All'}`, 14, 28);
+
+    const tableData = filteredAndSortedSignals.map(s => [
+      s.name,
+      s.industry,
+      s.region,
+      s.noveltyScore.toFixed(1),
+      s.indiaMarketFit.toFixed(1),
+      `${(s.estimatedBuildCost/1000).toFixed(0)}K`,
+      s.actionTag,
+      s.pitch.substring(0, 50) + (s.pitch.length > 50 ? '...' : '')
+    ]);
+
+    autoTable(doc, {
+      head: [['Name', 'Industry', 'Region', 'Novelty', 'Fit', 'Cost', 'Action', 'Pitch']],
+      body: tableData,
+      startY: 35,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    doc.save("startup_signals_export.pdf");
+  };
+
   return (
     <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs">
       <Panel defaultSize={selectedSignal ? 45 : 100} minSize={30} className="flex flex-col h-full overflow-y-auto pr-2 space-y-4 relative">
@@ -273,13 +345,26 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
           >
             [Refresh]
           </button>
-          <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`text-xs font-bold uppercase p-1 border transition-colors ${showAdvancedFilters ? 'bg-primary/20 text-primary border-primary' : 'text-muted-foreground border-transparent hover:border-border'}`}
-            title="Toggle Filters (F3)"
-          >
-            [Filters]
-          </button>
+
+          <div className="relative group inline-block">
+            <button className="text-xs text-primary font-bold uppercase hover:bg-primary/20 p-1 border border-transparent hover:border-primary transition-colors">
+              [Export ▼]
+            </button>
+            <div className="absolute right-0 mt-1 w-32 bg-black border border-primary shadow-lg hidden group-hover:block z-50">
+              <button
+                onClick={exportToCSV}
+                className="w-full text-left px-4 py-2 text-xs text-primary hover:bg-primary/20 uppercase font-bold"
+              >
+                CSV
+              </button>
+              <button
+                onClick={exportToPDF}
+                className="w-full text-left px-4 py-2 text-xs text-primary hover:bg-primary/20 uppercase font-bold"
+              >
+                PDF
+              </button>
+            </div>
+          </div>
           <div className="text-xs text-muted-foreground font-mono">
             COUNT: {filteredAndSortedSignals.length}
           </div>

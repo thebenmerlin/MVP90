@@ -6,6 +6,9 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import DiveModule from "./DiveModule";
 import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import ScoreExplainerModal from "./ScoreExplainerModal";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 
 interface StartupSignal {
   id: number;
@@ -65,6 +68,78 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
     // In a real app, this would make an API call
   };
 
+
+  const exportStartupToPDF = () => {
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(41, 128, 185);
+    doc.text(startup.name, 14, 22);
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text(`${startup.industry} • ${startup.region} • ${startup.actionTag}`, 14, 30);
+
+    // Pitch
+    doc.setFontSize(14);
+    doc.setTextColor(40);
+    doc.text('Pitch', 14, 45);
+    doc.setFontSize(11);
+    doc.setTextColor(80);
+    const splitPitch = doc.splitTextToSize(startup.pitch, 180);
+    doc.text(splitPitch, 14, 52);
+
+    let currentY = 52 + (splitPitch.length * 5) + 10;
+
+    // Key Details
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Key Details', '']],
+      body: [
+        ['Team', startup.team],
+        ['Founder Background', startup.founderBackground],
+        ['Source', startup.source],
+        ['Estimated Build Cost', `${startup.estimatedBuildCost.toLocaleString()}`]
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 15;
+
+    // Scores
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Scoring Metric', 'Score / 10']],
+      body: [
+        ['Novelty Score', startup.noveltyScore.toFixed(1)],
+        ['Cloneability Risk (Lower is better)', startup.cloneabilityScore.toFixed(1)],
+        ['India Market Fit', startup.indiaMarketFit.toFixed(1)],
+        ['MVP90 Overall Score', ((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3).toFixed(1)]
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 15;
+
+    // Traction
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Traction Signals', 'Value']],
+      body: [
+        ['GitHub Stars', startup.tractionSignals.githubStars.toLocaleString()],
+        ['Twitter Followers', startup.tractionSignals.twitterFollowers.toLocaleString()],
+        ['Substack Posts', startup.tractionSignals.substackPosts.toLocaleString()]
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+
+    doc.save(`${startup.name.replace(/\s+/g, '_')}_profile.pdf`);
+  };
+
   const handleScoreClick = (scoreName: string, value: number) => {
     setSelectedScore({ name: scoreName, value });
     setActiveTab("score_explainer");
@@ -119,6 +194,12 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
             </span>
           </div>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={exportStartupToPDF}
+              className="px-4 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors"
+            >
+              Export PDF
+            </button>
             <button
               onClick={handleSaveToWatchlist}
               className={`px-4 py-2 rounded text-sm transition-colors ${
