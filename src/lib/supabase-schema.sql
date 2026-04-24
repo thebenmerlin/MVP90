@@ -2,7 +2,8 @@
 -- Run this SQL in your Supabase SQL editor to create the required tables
 
 -- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret-here';
+-- Note: The JWT secret should be securely configured via the Supabase Dashboard
+-- or environment variables. Do not hardcode it in this schema file.
 
 -- Create custom types
 CREATE TYPE user_role AS ENUM ('viewer', 'analyst', 'admin');
