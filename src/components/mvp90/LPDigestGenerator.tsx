@@ -268,26 +268,26 @@ ${digestData.marketInsights.map(insight => `
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "High": return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "Medium": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "Low": return "bg-green-500/20 text-green-400 border-green-500/30";
-      default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      case "High": return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800";
+      case "Medium": return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800";
+      case "Low": return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800";
+      default: return "bg-muted text-muted-foreground border-border";
     }
   };
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case "High": return "text-red-400";
-      case "Medium": return "text-yellow-400";
-      case "Low": return "text-green-400";
+      case "High": return "text-[var(--negative)]";
+      case "Medium": return "text-[var(--warning)]";
+      case "Low": return "text-[var(--positive)]";
       default: return "text-muted-foreground";
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 8.5) return "text-green-400";
-    if (score >= 7.5) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 8.5) return "text-[var(--positive)]";
+    if (score >= 7.5) return "text-[var(--warning)]";
+    return "text-[var(--negative)]";
   };
 
   return (

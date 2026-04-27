@@ -226,9 +226,9 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
   };
 
   const getReputationColor = (score: number) => {
-    if (score >= 8.5) return "text-green-400";
-    if (score >= 7) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 8.5) return "text-[var(--positive)]";
+    if (score >= 7) return "text-[var(--warning)]";
+    return "text-[var(--negative)]";
   };
 
   const quickSearches = [
@@ -242,17 +242,17 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
   return (
     <div className="space-y-6 h-full overflow-y-auto pr-4 pb-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Founder Intelligence Search</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-[22px] font-semibold tracking-tight mb-2">Founder Intelligence Search</h2>
+        <p className="text-[13px] text-muted-foreground">
           Search for founder profiles, background, and network connections
         </p>
       </div>
 
       {/* Search Form */}
-      <div className="bg-card border border-border rounded-lg p-6">
+      <div className="bg-card border border-border rounded p-5">
         <form onSubmit={handleSearch} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="text-[12px] font-medium text-foreground mb-1 block">
               Search by name, company, or LinkedIn handle
             </label>
             <div className="flex space-x-2">
@@ -261,13 +261,13 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
                 placeholder="e.g., 'Priya Sharma', 'NeuroLink AI', or 'priya-sharma-neuroscience'"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="flex-1 p-3 rounded border border-border bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="flex-1 h-10 border border-border rounded bg-input px-3 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={loading || !query.trim()}
-                className="px-6 py-3 bg-primary text-primary-foreground rounded font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-10 px-5 bg-primary text-primary-foreground rounded text-[13px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Searching..." : "Search"}
               </button>
@@ -276,14 +276,14 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
           {/* Quick Searches */}
           <div>
-            <div className="text-sm text-muted-foreground mb-2">Quick searches:</div>
+            <div className="text-[12px] text-muted-foreground mb-2">Quick searches:</div>
             <div className="flex flex-wrap gap-2">
               {quickSearches.map((search) => (
                 <button
                   key={search}
                   type="button"
                   onClick={() => setQuery(search)}
-                  className="px-3 py-1 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors"
+                  className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors border border-border"
                 >
                   {search}
                 </button>
@@ -294,14 +294,14 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
           {/* Search History */}
           {searchHistory.length > 0 && (
             <div>
-              <div className="text-sm text-muted-foreground mb-2">Recent searches:</div>
+              <div className="text-[12px] text-muted-foreground mb-2">Recent searches:</div>
               <div className="flex flex-wrap gap-2">
                 {searchHistory.map((search, index) => (
                   <button
                     key={index}
                     type="button"
                     onClick={() => setQuery(search)}
-                    className="px-3 py-1 bg-muted text-muted-foreground rounded text-sm hover:bg-muted/80 transition-colors"
+                    className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors border border-border"
                   >
                     {search}
                   </button>
@@ -314,10 +314,10 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
       {/* Error State */}
       {error && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-lg">
+        <div className="border-l-4 border-destructive bg-destructive/5 px-4 py-3 rounded-sm text-[13px] text-destructive">
           <div className="font-medium mb-1">No Results Found</div>
-          <div className="text-sm">{error}</div>
-          <div className="text-sm mt-2">
+          <div className="text-[13px]">{error}</div>
+          <div className="text-[13px] mt-2">
             Try searching for: {quickSearches.slice(0, 3).join(", ")}
           </div>
         </div>
@@ -325,12 +325,12 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
       {/* Results */}
       {result && (
-        <div className="bg-card border border-border rounded-lg p-6 space-y-6">
+        <div className="bg-card border border-border rounded p-5 space-y-5">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="text-xl font-bold">{result.name}</h3>
+                <h3 className="text-[20px] font-semibold">{result.name}</h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -348,11 +348,11 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <p className="text-muted-foreground">{result.currentRole} at {result.company}</p>
+              <p className="text-[13px] text-muted-foreground">{result.currentRole} at {result.company}</p>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground mb-1">Reputation Score</div>
-              <div className={`text-2xl font-bold ${getReputationColor(result.reputation.score)}`}>
+              <div className="text-[12px] font-medium text-muted-foreground mb-1">Reputation Score</div>
+              <div className={`text-[24px] font-mono font-semibold ${getReputationColor(result.reputation.score)}`}>
                 {result.reputation.score}/10
               </div>
             </div>
@@ -364,30 +364,30 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
             <div className="space-y-4">
               {/* Education */}
               <div>
-                <h4 className="font-semibold mb-2">Education</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Education</h4>
                 <ul className="space-y-1 text-sm">
                   {result.education.map((edu, index) => (
-                    <li key={index} className="text-muted-foreground">• {edu}</li>
+                    <li key={index} className="text-[13px] text-muted-foreground">• {edu}</li>
                   ))}
                 </ul>
               </div>
 
               {/* Work Background */}
               <div>
-                <h4 className="font-semibold mb-2">Work Experience</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Work Experience</h4>
                 <ul className="space-y-1 text-sm">
                   {result.workBackground.map((work, index) => (
-                    <li key={index} className="text-muted-foreground">• {work}</li>
+                    <li key={index} className="text-[13px] text-muted-foreground">• {work}</li>
                   ))}
                 </ul>
               </div>
 
               {/* Past Companies */}
               <div>
-                <h4 className="font-semibold mb-2">Past Companies</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Past Companies</h4>
                 <ul className="space-y-1 text-sm">
                   {result.pastCompanies.map((company, index) => (
-                    <li key={index} className="text-muted-foreground">• {company}</li>
+                    <li key={index} className="text-[13px] text-muted-foreground">• {company}</li>
                   ))}
                 </ul>
               </div>
@@ -397,30 +397,30 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
             <div className="space-y-4">
               {/* Social Links */}
               <div>
-                <h4 className="font-semibold mb-2">Social Presence</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Social Presence</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {result.socialLinks.twitter && (
                     <div className="flex justify-between">
-                      <span>Twitter:</span>
-                      <span className="text-blue-400">{result.socialLinks.twitter}</span>
+                      <span className="text-[13px]">Twitter:</span>
+                      <span className="text-[13px] text-accent">{result.socialLinks.twitter}</span>
                     </div>
                   )}
                   {result.socialLinks.github && (
                     <div className="flex justify-between">
-                      <span>GitHub:</span>
-                      <span className="text-purple-400">{result.socialLinks.github}</span>
+                      <span className="text-[13px]">GitHub:</span>
+                      <span className="text-[13px] text-muted-foreground">{result.socialLinks.github}</span>
                     </div>
                   )}
                   {result.socialLinks.linkedin && (
                     <div className="flex justify-between">
-                      <span>LinkedIn:</span>
-                      <span className="text-blue-600">{result.socialLinks.linkedin}</span>
+                      <span className="text-[13px]">LinkedIn:</span>
+                      <span className="text-[13px] text-accent">{result.socialLinks.linkedin}</span>
                     </div>
                   )}
                   {result.socialLinks.substack && (
                     <div className="flex justify-between">
-                      <span>Substack:</span>
-                      <span className="text-orange-400">{result.socialLinks.substack}</span>
+                      <span className="text-[13px]">Substack:</span>
+                      <span className="text-[13px] text-muted-foreground">{result.socialLinks.substack}</span>
                     </div>
                   )}
                 </div>
@@ -428,17 +428,17 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
               {/* Network Overlaps */}
               <div>
-                <h4 className="font-semibold mb-2">Network Overlaps</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Network Overlaps</h4>
                 <div className="space-y-2">
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">VCs:</div>
-                    <div className="text-sm">
+                    <div className="text-[12px] font-medium text-muted-foreground mb-1">VCs:</div>
+                    <div className="text-[13px]">
                       {result.networkOverlaps.vcs.join(", ")}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground mb-1">Operators:</div>
-                    <div className="text-sm">
+                    <div className="text-[12px] font-medium text-muted-foreground mb-1">Operators:</div>
+                    <div className="text-[13px]">
                       {result.networkOverlaps.operators.join(", ")}
                     </div>
                   </div>
@@ -447,10 +447,10 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
               {/* Reputation Factors */}
               <div>
-                <h4 className="font-semibold mb-2">Reputation Factors</h4>
+                <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Reputation Factors</h4>
                 <ul className="space-y-1 text-sm">
                   {result.reputation.factors.map((factor, index) => (
-                    <li key={index} className="text-muted-foreground">• {factor}</li>
+                    <li key={index} className="text-[13px] text-muted-foreground">• {factor}</li>
                   ))}
                 </ul>
               </div>
@@ -459,16 +459,16 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
 
           {/* Recent Activity */}
           <div>
-            <h4 className="font-semibold mb-3">Recent Activity</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Recent Activity</h4>
             <div className="space-y-2">
               {result.recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-muted/50 rounded">
-                  <div className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
+                <div key={index} className="flex items-start gap-3 p-3 bg-muted/30 rounded border border-border">
+                  <div className="text-[11px] font-medium bg-muted text-muted-foreground rounded px-2 py-0.5">
                     {activity.type}
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm">{activity.description}</div>
-                    <div className="text-xs text-muted-foreground">{activity.date}</div>
+                    <div className="text-[13px]">{activity.description}</div>
+                    <div className="text-[11px] text-muted-foreground">{activity.date}</div>
                   </div>
                 </div>
               ))}
@@ -478,24 +478,24 @@ const FounderIntelligenceSearch: React.FC<FounderIntelligenceSearchProps> = ({ u
           {/* Funding History */}
           {result.fundingHistory.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-3">Funding History</h4>
+              <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Funding History</h4>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-[13px]">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-2">Company</th>
-                      <th className="text-left py-2">Round</th>
-                      <th className="text-left py-2">Amount</th>
-                      <th className="text-left py-2">Year</th>
+                      <th className="text-left py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Company</th>
+                      <th className="text-left py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Round</th>
+                      <th className="text-left py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Amount</th>
+                      <th className="text-left py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Year</th>
                     </tr>
                   </thead>
                   <tbody>
                     {result.fundingHistory.map((funding, index) => (
                       <tr key={index} className="border-b border-border/50">
-                        <td className="py-2">{funding.company}</td>
-                        <td className="py-2">{funding.round}</td>
-                        <td className="py-2 font-medium">{funding.amount}</td>
-                        <td className="py-2">{funding.year}</td>
+                        <td className="py-2 text-[13px]">{funding.company}</td>
+                        <td className="py-2 text-[13px]">{funding.round}</td>
+                        <td className="py-2 font-mono font-medium">{funding.amount}</td>
+                        <td className="py-2 font-mono">{funding.year}</td>
                       </tr>
                     ))}
                   </tbody>
