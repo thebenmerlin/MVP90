@@ -96,17 +96,17 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'scraped': return 'text-blue-400';
-      case 'enriched': return 'text-yellow-400';
-      case 'scored': return 'text-green-400';
+      case 'scraped': return 'text-[var(--accent)]';
+      case 'enriched': return 'text-[var(--warning)]';
+      case 'scored': return 'text-[var(--positive)]';
       default: return 'text-muted-foreground';
     }
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.9) return 'text-green-400';
-    if (confidence >= 0.7) return 'text-yellow-400';
-    return 'text-red-400';
+    if (confidence >= 0.9) return 'text-[var(--positive)]';
+    if (confidence >= 0.7) return 'text-[var(--warning)]';
+    return 'text-[var(--negative)]';
   };
 
   const copyToClipboard = (text: string) => {
@@ -131,54 +131,54 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
         {signalData && (
           <div className="space-y-6">
             {/* Overview */}
-            <div className="border border-border p-3">
-              <h3 className="text-sm font-semibold mb-2">Signal Overview</h3>
-              <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="border border-border rounded p-3 bg-card">
+              <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Signal Overview</h3>
+              <div className="grid grid-cols-2 gap-4 text-[12px]">
                 <div>
                   <span className="text-muted-foreground">Entity ID:</span>
-                  <span className="ml-2 font-medium">{signalData.id}</span>
+                  <span className="ml-2 font-mono font-medium text-foreground">{signalData.id}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Quality Score:</span>
-                  <span className={`ml-2 font-medium ${getConfidenceColor(signalData.quality_score)}`}>
+                  <span className={`ml-2 font-mono font-medium ${getConfidenceColor(signalData.quality_score)}`}>
                     {(signalData.quality_score * 100).toFixed(1)}%
                   </span>
                 </div>
                 <div className="col-span-2">
                   <span className="text-muted-foreground">Ingestion:</span>
-                  <span className="ml-2 font-medium">{formatTimestamp(signalData.ingestion_timestamp)}</span>
+                  <span className="ml-2 font-mono font-medium text-foreground">{formatTimestamp(signalData.ingestion_timestamp)}</span>
                 </div>
               </div>
             </div>
 
             {/* Source Metadata */}
-            <div className="border border-border p-3">
-              <h3 className="text-sm font-semibold mb-3">Source Metadata ({signalData.source_metadata.length} sources)</h3>
+            <div className="border border-border rounded p-3 bg-card">
+              <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Source Metadata ({signalData.source_metadata.length} sources)</h3>
               <div className="space-y-3">
                 {signalData.source_metadata.map((source, index) => (
-                  <div key={index} className="border border-border/50 p-2">
+                  <div key={index} className="border border-border/50 rounded p-2">
                     <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs font-semibold text-primary">{source.source_name}</span>
-                        <span className="text-xs text-muted-foreground">#{source.source_id}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] font-semibold text-primary">{source.source_name}</span>
+                        <span className="text-[12px] text-muted-foreground font-mono">#{source.source_id}</span>
                         {source.confidence && (
-                          <span className={`text-xs ${getConfidenceColor(source.confidence)}`}>
+                          <span className={`text-[12px] font-mono ${getConfidenceColor(source.confidence)}`}>
                             {(source.confidence * 100).toFixed(0)}%
                           </span>
                         )}
                       </div>
                       <button
                         onClick={() => copyToClipboard(source.raw_snippet)}
-                        className="text-xs text-muted-foreground hover:text-foreground"
+                        className="text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-150"
                         title="Copy snippet"
                       >
                         Copy
                       </button>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-2">
+                    <div className="text-[12px] text-muted-foreground font-mono mb-2">
                       Crawled: {formatTimestamp(source.crawl_ts)}
                     </div>
-                    <div className="text-xs bg-muted/30 p-2 border-l-2 border-primary/30">
+                    <div className="text-[12px] font-mono bg-muted/30 p-2 border-l-2 border-primary/30 text-foreground">
                       "{source.raw_snippet}"
                     </div>
                   </div>
@@ -187,20 +187,20 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
             </div>
 
             {/* Signal Chain */}
-            <div className="border border-border p-3">
-              <h3 className="text-sm font-semibold mb-3">Signal Processing Chain</h3>
+            <div className="border border-border rounded p-3 bg-card">
+              <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Signal Processing Chain</h3>
               <div className="space-y-2">
                 {signalData.signal_chain.map((step, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                     <div className="flex-1 flex justify-between items-center">
-                      <div className="flex items-center space-x-2">
-                        <span className={`text-xs font-semibold ${getStatusColor(step.status)}`}>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[12px] font-mono font-semibold ${getStatusColor(step.status)}`}>
                           {step.status.toUpperCase()}
                         </span>
-                        <span className="text-xs text-muted-foreground">by {step.processor}</span>
+                        <span className="text-[12px] text-muted-foreground">by {step.processor}</span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[12px] text-muted-foreground font-mono">
                         {formatTimestamp(step.timestamp)}
                       </span>
                     </div>
@@ -212,13 +212,13 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
             {/* Tags and Classifications */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Tags */}
-              <div className="border border-border p-3">
-                <h3 className="text-sm font-semibold mb-3">Tags ({signalData.tags.length})</h3>
+              <div className="border border-border rounded p-3 bg-card">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Tags ({signalData.tags.length})</h3>
                 <div className="flex flex-wrap gap-1">
                   {signalData.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 bg-primary/20 text-primary text-xs border border-primary/30"
+                      className="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-medium rounded-full border border-primary/20"
                     >
                       {tag}
                     </span>
@@ -227,16 +227,16 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
               </div>
 
               {/* ML Classifications */}
-              <div className="border border-border p-3">
-                <h3 className="text-sm font-semibold mb-3">ML Classifications</h3>
+              <div className="border border-border rounded p-3 bg-card">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">ML Classifications</h3>
                 <div className="space-y-2">
                   {signalData.ml_classifications.map((classification, index) => (
                     <div key={index} className="flex justify-between items-center">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs text-muted-foreground">{classification.category}:</span>
-                        <span className="text-xs font-medium">{classification.value}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] text-muted-foreground">{classification.category}:</span>
+                        <span className="text-[12px] font-medium text-foreground">{classification.value}</span>
                       </div>
-                      <span className={`text-xs ${getConfidenceColor(classification.confidence)}`}>
+                      <span className={`text-[12px] font-mono ${getConfidenceColor(classification.confidence)}`}>
                         {(classification.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -246,8 +246,8 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
             </div>
 
             {/* Associated Links */}
-            <div className="border border-border p-3">
-              <h3 className="text-sm font-semibold mb-3">Associated Links ({signalData.associated_links.length})</h3>
+            <div className="border border-border rounded p-3 bg-card">
+              <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Associated Links ({signalData.associated_links.length})</h3>
               <div className="space-y-1">
                 {signalData.associated_links.map((link, index) => (
                   <div key={index} className="flex items-center justify-between">
@@ -255,13 +255,13 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
                       href={sanitizeUrl(link)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-400 hover:text-blue-300 truncate flex-1"
+                      className="text-[12px] text-accent hover:underline truncate flex-1 font-mono"
                     >
                       {link}
                     </a>
                     <button
                       onClick={() => copyToClipboard(link)}
-                      className="ml-2 text-xs text-muted-foreground hover:text-foreground"
+                      className="ml-2 text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-150"
                       title="Copy link"
                     >
                       Copy
@@ -273,9 +273,9 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
 
             {/* Processing Notes */}
             {signalData.processing_notes && (
-              <div className="border border-border p-3">
-                <h3 className="text-sm font-semibold mb-2">Processing Notes</h3>
-                <div className="text-xs text-muted-foreground bg-muted/30 p-2 border-l-2 border-yellow-400/30">
+              <div className="border border-border rounded p-3 bg-card">
+                <h3 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Processing Notes</h3>
+                <div className="text-[12px] text-muted-foreground font-mono bg-muted/30 p-2 border-l-2 border-[var(--warning)]/30">
                   {signalData.processing_notes}
                 </div>
               </div>
@@ -283,20 +283,20 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
 
             {/* Actions */}
             <div className="flex justify-between items-center pt-4 border-t border-border">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-[12px] text-muted-foreground font-mono">
                 Last updated: {formatTimestamp(signalData.ingestion_timestamp)}
               </div>
-              <div className="flex space-x-2">
+              <div className="flex gap-2">
                 <button
                   onClick={() => copyToClipboard(JSON.stringify(signalData, null, 2))}
-                  className="px-3 py-1 bg-secondary text-secondary-foreground text-xs hover:bg-secondary/80 transition-colors"
+                  className="px-3 py-1.5 bg-secondary text-secondary-foreground text-[12px] font-medium rounded hover:bg-secondary/80 transition-colors duration-150"
                 >
                   Copy JSON
                 </button>
                 {!inline && (
                   <button
                     onClick={onClose}
-                    className="px-3 py-1 bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors"
+                    className="px-3 py-1.5 bg-primary text-primary-foreground text-[12px] font-medium rounded hover:bg-primary/90 transition-colors duration-150"
                   >
                     Close
                   </button>
@@ -309,15 +309,15 @@ const RawSignalBreakdownModal: React.FC<RawSignalBreakdownModalProps> = ({
   );
 
   if (inline) {
-    return <div className="font-mono">{content}</div>;
+    return <div>{content}</div>;
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border border-border rounded-lg shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold">
-            Raw Signal Breakdown - {entityName}
+          <DialogTitle className="text-[15px] font-semibold text-foreground">
+            Raw Signal Breakdown — {entityName}
           </DialogTitle>
         </DialogHeader>
         {content}

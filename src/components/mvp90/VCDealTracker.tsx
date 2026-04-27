@@ -218,20 +218,20 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
 
   const getConfidenceColor = (confidence: string) => {
     switch (confidence) {
-      case "High": return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "Medium": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "Low": return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "High": return "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800";
+      case "Medium": return "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800";
+      case "Low": return "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case "Seed": return "bg-blue-500/20 text-blue-400";
-      case "Pre-Series A": return "bg-purple-500/20 text-purple-400";
-      case "Series A": return "bg-green-500/20 text-green-400";
-      case "Series B": return "bg-orange-500/20 text-orange-400";
-      case "Series C+": return "bg-red-500/20 text-red-400";
+      case "Seed": return "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300";
+      case "Pre-Series A": return "bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300";
+      case "Series A": return "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300";
+      case "Series B": return "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300";
+      case "Series C+": return "bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-300";
       default: return "bg-gray-500/20 text-gray-400";
     }
   };
@@ -252,23 +252,22 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
     <div className="space-y-6 h-full overflow-y-auto pr-4 pb-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">VC Deal Tracker</h2>
-          <p className="text-muted-foreground">Recent funding rounds and investment activity</p>
+          <h2 className="text-[22px] font-semibold tracking-tight">VC Deal Tracker</h2>
+          <p className="text-[13px] text-muted-foreground">Recent funding rounds and investment activity</p>
         </div>
-        <div className="text-sm text-muted-foreground">
-          {filteredDeals.length} deals found
+        <div className="text-[12px] text-muted-foreground font-mono">
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-card border border-border rounded-lg p-4">
+      <div className="bg-card border border-border rounded p-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Geography</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Geography</label>
             <select
               value={filters.geography}
               onChange={(e) => setFilters({ ...filters, geography: e.target.value })}
-              className="w-full p-2 rounded border border-border bg-input text-foreground text-sm"
+              className="w-full h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">All Regions</option>
               {geographies.map(geo => (
@@ -278,11 +277,11 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Industry</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Industry</label>
             <select
               value={filters.industry}
               onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-              className="w-full p-2 rounded border border-border bg-input text-foreground text-sm"
+              className="w-full h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">All Industries</option>
               {industries.map(industry => (
@@ -292,11 +291,11 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Stage</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Stage</label>
             <select
               value={filters.stage}
               onChange={(e) => setFilters({ ...filters, stage: e.target.value })}
-              className="w-full p-2 rounded border border-border bg-input text-foreground text-sm"
+              className="w-full h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">All Stages</option>
               {stages.map(stage => (
@@ -306,22 +305,22 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Lead Investor</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Lead Investor</label>
             <input
               type="text"
               placeholder="Search investor..."
               value={filters.leadInvestor}
               onChange={(e) => setFilters({ ...filters, leadInvestor: e.target.value })}
-              className="w-full p-2 rounded border border-border bg-input text-foreground text-sm"
+              className="w-full h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Date Range</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Date Range</label>
             <select
               value={filters.dateRange}
               onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-              className="w-full p-2 rounded border border-border bg-input text-foreground text-sm"
+              className="w-full h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="all">All Time</option>
               <option value="7d">Last 7 days</option>
@@ -331,12 +330,12 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Sort By</label>
+            <label className="text-[12px] font-medium text-foreground mb-1 block">Sort By</label>
             <div className="flex space-x-1">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as "date" | "roundSize" | "valuation")}
-                className="flex-1 p-2 rounded border border-border bg-input text-foreground text-sm"
+                className="flex-1 h-9 border border-border rounded bg-input px-2 text-[13px] focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="date">Date</option>
                 <option value="roundSize">Round Size</option>
@@ -344,7 +343,7 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
               </select>
               <button
                 onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                className="px-2 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors"
+                className="h-9 px-3 bg-muted border border-border rounded text-[13px] hover:bg-muted/80 transition-colors"
               >
                 {sortOrder === "desc" ? "↓" : "↑"}
               </button>
@@ -355,11 +354,11 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
         <div className="flex justify-between items-center">
           <button
             onClick={() => setFilters({ geography: "", industry: "", stage: "", leadInvestor: "", dateRange: "all" })}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
           >
             Clear all filters
           </button>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-[13px] text-muted-foreground font-mono">
             Total funding: ${filteredDeals.reduce((sum, deal) => sum + parseFloat(deal.roundSize.replace(/[$M]/g, "")), 0).toFixed(1)}M
           </div>
         </div>
@@ -371,38 +370,38 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           const stageDeals = filteredDeals.filter((d) => d.stage === stageColumn);
           if (stageDeals.length === 0) return null;
           return (
-            <div key={stageColumn} className="min-w-[300px] flex-1 flex flex-col gap-3">
-              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wide border-b border-border pb-2">
-                <span>{stageColumn}</span>
-                <span className="text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">{stageDeals.length}</span>
+            <div key={stageColumn} className="min-w-[280px] flex-1 flex flex-col gap-3">
+              <div className="flex justify-between items-center bg-muted/50 rounded p-3">
+                <span className="text-[12px] font-semibold uppercase tracking-wide text-foreground">{stageColumn}</span>
+                <span className="text-[11px] bg-muted rounded-full px-2 py-0.5 text-muted-foreground font-mono ml-2">{stageDeals.length}</span>
               </div>
               <div className="space-y-3 flex-1 overflow-y-auto">
                 {stageDeals.map((deal) => (
                   <div
                     key={deal.id}
-                    className="bg-card border border-border p-3 hover:bg-muted/50 cursor-pointer transition-colors shadow-sm"
+                    className="bg-card border border-border rounded p-4 shadow-sm hover:shadow-md transition-shadow duration-150 cursor-pointer"
                     onClick={() => setSelectedDeal(deal)}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-bold text-sm truncate max-w-[180px]">{deal.startupName}</h3>
-                          <span className={`px-1.5 py-0.5 text-[10px] font-bold uppercase border ${getConfidenceColor(deal.confidence)}`}>
+                          <h3 className="text-[14px] font-semibold truncate max-w-[180px]">{deal.startupName}</h3>
+                          <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full ${getConfidenceColor(deal.confidence)}`}>
                             {deal.confidence}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{deal.description}</p>
+                        <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-2 mb-2">{deal.description}</p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-border pt-2">
+                    <div className="grid grid-cols-2 gap-2 border-t border-border pt-2">
                       <div>
-                        <div className="text-muted-foreground uppercase tracking-wider mb-0.5">Round Size</div>
-                        <div className="font-mono text-green-400 text-xs">{deal.roundSize}</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-0.5">Round Size</div>
+                        <div className="text-[13px] font-mono font-medium text-[var(--positive)]">{deal.roundSize}</div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground uppercase tracking-wider mb-0.5">Lead</div>
-                        <div className="truncate text-xs" title={deal.leadInvestor}>{deal.leadInvestor}</div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-0.5">Lead</div>
+                        <div className="text-[12px] truncate" title={deal.leadInvestor}>{deal.leadInvestor}</div>
                       </div>
                     </div>
                   </div>
@@ -415,10 +414,10 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
 
       {filteredDeals.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-muted-foreground mb-2">No deals match your current filters</div>
+          <div className="text-[15px] font-medium mb-1">No deals match your filters</div>
           <button
             onClick={() => setFilters({ geography: "", industry: "", stage: "", leadInvestor: "", dateRange: "all" })}
-            className="text-primary hover:underline"
+            className="text-[13px] text-accent hover:underline"
           >
             Clear all filters
           </button>
@@ -428,17 +427,17 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
       {/* Deal Detail Modal */}
       {selectedDeal && (
         <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 backdrop-blur-sm">
-          <div className="bg-card border border-border rounded-lg w-4/5 max-w-3xl max-h-4/5 shadow-2xl overflow-y-auto">
+          <div className="bg-card border border-border rounded-lg max-w-2xl w-full max-h-[85vh] shadow-xl overflow-y-auto">
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold">{selectedDeal.startupName}</h3>
-                  <p className="text-muted-foreground">{selectedDeal.industry} • {selectedDeal.geography}</p>
+                  <h3 className="text-[20px] font-semibold">{selectedDeal.startupName}</h3>
+                  <p className="text-[13px] text-muted-foreground">{selectedDeal.industry} • {selectedDeal.geography}</p>
                 </div>
                 <button
                   onClick={() => setSelectedDeal(null)}
-                  className="px-4 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 transition-colors"
+                  className="h-8 px-3 text-[13px] font-medium border border-border rounded hover:bg-muted transition-colors"
                 >
                   Close
                 </button>
@@ -448,36 +447,36 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2">Deal Details</h4>
-                    <div className="space-y-2 text-sm">
+                    <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Deal Details</h4>
+                    <div className="space-y-2 text-[13px]">
                       <div className="flex justify-between">
                         <span>Stage:</span>
-                        <span className={`px-2 py-1 rounded text-xs ${getStageColor(selectedDeal.stage)}`}>
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-medium ${getStageColor(selectedDeal.stage)}`}>
                           {selectedDeal.stage}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Round Size:</span>
-                        <span className="font-semibold text-green-400">{selectedDeal.roundSize}</span>
+                        <span className="font-mono font-medium text-[var(--positive)]">{selectedDeal.roundSize}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Valuation:</span>
-                        <span className="font-semibold">{selectedDeal.valuation}</span>
+                        <span className="text-[13px] font-medium">{selectedDeal.valuation}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Date:</span>
-                        <span>{formatDate(selectedDeal.date)}</span>
+                        <span className="text-[13px] font-medium">{formatDate(selectedDeal.date)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Source:</span>
-                        <span>{selectedDeal.dealSource}</span>
+                        <span className="text-[13px]">{selectedDeal.dealSource}</span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2">Investors</h4>
-                    <div className="space-y-1 text-sm">
+                    <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Investors</h4>
+                    <div className="space-y-1 text-[13px]">
                       <div>
                         <span className="font-medium">Lead:</span> {selectedDeal.leadInvestor}
                       </div>
@@ -486,7 +485,7 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
                           <span className="font-medium">Others:</span>
                           <ul className="mt-1 ml-4">
                             {selectedDeal.otherInvestors.map((investor, index) => (
-                              <li key={index} className="text-muted-foreground">• {investor}</li>
+                              <li key={index} className="text-[13px] text-muted-foreground">• {investor}</li>
                             ))}
                           </ul>
                         </div>
@@ -497,20 +496,20 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2">Company Description</h4>
-                    <p className="text-sm text-muted-foreground">{selectedDeal.description}</p>
+                    <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Company Description</h4>
+                    <p className="text-[13px] text-muted-foreground">{selectedDeal.description}</p>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2">Founder Background</h4>
-                    <p className="text-sm text-muted-foreground">{selectedDeal.founderBackground}</p>
+                    <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Founder Background</h4>
+                    <p className="text-[13px] text-muted-foreground">{selectedDeal.founderBackground}</p>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2">Use of Funds</h4>
+                    <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">Use of Funds</h4>
                     <ul className="text-sm space-y-1">
                       {selectedDeal.useOfFunds.map((use, index) => (
-                        <li key={index} className="text-muted-foreground">• {use}</li>
+                        <li key={index} className="text-[13px] text-muted-foreground">• {use}</li>
                       ))}
                     </ul>
                   </div>
@@ -520,13 +519,13 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
               {/* Actions */}
               {(userRole === "Admin" || userRole === "Analyst") && (
                 <div className="flex space-x-2 pt-4 border-t border-border">
-                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:bg-primary/90 transition-colors">
+                  <button className="h-9 px-4 text-[13px] font-medium rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
                     Add to Watchlist
                   </button>
-                  <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors">
+                  <button className="h-9 px-4 text-[13px] font-medium rounded bg-muted border border-border hover:bg-muted/80 transition-colors">
                     Export Deal
                   </button>
-                  <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors">
+                  <button className="h-9 px-4 text-[13px] font-medium rounded bg-muted border border-border hover:bg-muted/80 transition-colors">
                     Research Company
                   </button>
                 </div>

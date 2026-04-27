@@ -9,6 +9,7 @@ import LPDigestGenerator from "@/components/mvp90/LPDigestGenerator";
 import SavedListsPanel from "@/components/mvp90/SavedListsPanel";
 import { GlobalCommandPalette } from "@/components/mvp90/GlobalCommandPalette";
 import AuditLogsPanel from "@/components/mvp90/AuditLogsPanel";
+import ThemeToggle from "@/components/mvp90/ThemeToggle";
 import { Panel, PanelGroup, PanelResizeHandle, ImperativePanelHandle } from "react-resizable-panels";
 import { useRef } from "react";
 
@@ -54,14 +55,14 @@ const TerminalPage = () => {
       case "Digest":
         return <LPDigestGenerator userRole={userRole} />;
       case "Thesis":
-        return <div className="p-4 text-sm text-muted-foreground uppercase font-mono tracking-widest">Thesis view under construction...</div>;
+        return <div className="p-6 text-[13px] text-muted-foreground">Thesis view under construction…</div>;
       default:
         return null;
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground dark font-mono text-sm overflow-hidden">
+    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       <GlobalCommandPalette
         onSelectStartup={(id) => {
           setCurrentModule("Feed");
@@ -69,26 +70,27 @@ const TerminalPage = () => {
         }}
         onSelectFounder={() => {
           setCurrentModule("Founders");
-          // Add logic to select founder
         }}
         onSelectCity={() => {
           setCurrentModule("Feed");
-          // Add logic to filter by city
         }}
       />
+
       {/* Top Navigation */}
-      <header className="flex items-center justify-between border-b border-border bg-card px-4 h-12 flex-shrink-0">
-        <div className="flex items-center gap-6">
-          <div className="font-bold text-primary uppercase tracking-widest mr-4">MVP90</div>
+      <header className="flex items-center justify-between border-b border-border bg-card px-6 h-14 flex-shrink-0">
+        <div className="flex items-center gap-8">
+          <div className="text-[15px] font-semibold text-foreground tracking-tight">
+            MVP<span className="text-primary font-bold">90</span>
+          </div>
           <nav className="flex space-x-1">
             {modules.map((module) => (
               <button
                 key={module.key}
                 onClick={() => setCurrentModule(module.key)}
-                className={`px-3 py-1 text-xs uppercase font-bold tracking-wider transition-colors border-b-2 ${
+                className={`px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 rounded-sm ${
                   currentModule === module.key
-                    ? "border-primary text-primary bg-primary/10"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    ? "text-primary bg-primary/8 border-b-2 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 {module.name}
@@ -96,29 +98,28 @@ const TerminalPage = () => {
             ))}
           </nav>
         </div>
-        
-        <div className="flex items-center gap-4 text-xs">
-          <div className="text-muted-foreground">Cmd+K to search</div>
+
+        <div className="flex items-center gap-3 text-[13px]">
+          <span className="text-muted-foreground text-[12px]">⌘K</span>
+          <ThemeToggle />
           {authenticated && (
-             <div className="flex items-center gap-2 border-l border-border pl-4">
-                <span className="text-muted-foreground uppercase">{userRole}</span>
-                <button
-                  onClick={() => setLogsExpanded(!logsExpanded)}
-                  className={`text-xs uppercase font-bold tracking-wider transition-colors px-2 py-1 ${
-                    logsExpanded
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  }`}
-                >
-                  LOGS
-                </button>
-                <button
-                  onClick={() => setAuthenticated(false)}
-                  className="text-muted-foreground hover:text-foreground underline decoration-muted-foreground/50 ml-2"
-                >
-                  LOGOUT
-                </button>
-             </div>
+            <div className="flex items-center gap-3 border-l border-border pl-3">
+              <span className="text-[12px] text-muted-foreground px-2 py-0.5 bg-muted rounded-full">{userRole}</span>
+              <button
+                onClick={() => setLogsExpanded(!logsExpanded)}
+                className={`text-[13px] font-medium transition-colors duration-150 ${
+                  logsExpanded ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Logs
+              </button>
+              <button
+                onClick={() => setAuthenticated(false)}
+                className="text-[13px] text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                Sign out
+              </button>
+            </div>
           )}
         </div>
       </header>
@@ -129,52 +130,62 @@ const TerminalPage = () => {
           <Panel defaultSize={logsExpanded ? 80 : 100} minSize={50} className="flex flex-col min-h-0">
             <PanelGroup direction="vertical">
               <Panel defaultSize={pipelineExpanded ? 50 : 95} minSize={30}>
-            {/* The renderModule handles rendering either Feed, Founders, etc. */}
-            {/* Inside Feed, we have another PanelGroup for left-table, right-detail pane */}
-            <div className="h-full w-full pl-4 pt-4 pb-0 pr-0">
-               {renderModule()}
-            </div>
-          </Panel>
-
-          <PanelResizeHandle className="h-1 bg-border hover:bg-primary/50 cursor-row-resize z-10" />
-
-          <Panel defaultSize={pipelineExpanded ? 50 : 5} minSize={5} maxSize={80} collapsible onCollapse={() => setPipelineExpanded(false)} onExpand={() => setPipelineExpanded(true)}>
-             <div className="h-full flex flex-col bg-card border-t border-border transition-all">
-                <div
-                  className="flex items-center justify-between px-4 py-2 cursor-pointer bg-muted/20 border-b border-border hover:bg-muted/40"
-                  onClick={togglePipeline}
-                >
-                   <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
-                     <span className="text-primary">{pipelineExpanded ? "▼" : "▲"}</span> PIPELINE
-                   </div>
-                   {!pipelineExpanded && (
-                     <div className="text-xs text-muted-foreground font-mono flex gap-4">
-                       <span>SCOUT <span className="text-foreground">12</span></span>
-                       <span>WATCHING <span className="text-foreground">4</span></span>
-                       <span>IN DD <span className="text-foreground">2</span></span>
-                       <span>INVESTED <span className="text-foreground">1</span></span>
-                     </div>
-                   )}
+                <div className="h-full w-full pl-4 pt-4 pb-0 pr-0">
+                  {renderModule()}
                 </div>
-                    {pipelineExpanded && (
-                      <div className="flex-1 overflow-auto p-4 relative">
-                        {currentModule === "Pipeline" ? (
-                           <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs uppercase">
-                             Pipeline is already open in main view.
-                           </div>
-                        ) : (
-                           <VCDealTracker userRole={userRole} />
-                        )}
+              </Panel>
+
+              <PanelResizeHandle className="h-px bg-border hover:bg-accent/40 cursor-row-resize z-10" />
+
+              <Panel
+                ref={pipelinePanelRef}
+                defaultSize={pipelineExpanded ? 50 : 5}
+                minSize={5}
+                maxSize={80}
+                collapsible
+                onCollapse={() => setPipelineExpanded(false)}
+                onExpand={() => setPipelineExpanded(true)}
+              >
+                <div className="h-full flex flex-col bg-card border-t border-border transition-all">
+                  <div
+                    className="flex items-center justify-between px-4 py-2 cursor-pointer bg-muted/30 border-b border-border hover:bg-muted/50 transition-colors duration-150"
+                    onClick={togglePipeline}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-1 rounded-full bg-border" />
+                      <span className="text-[13px] font-medium text-foreground">Pipeline</span>
+                    </div>
+                    {!pipelineExpanded && (
+                      <div className="text-[12px] text-muted-foreground flex gap-3">
+                        <span>Scout <span className="font-mono font-medium text-foreground">12</span></span>
+                        <span className="text-border">·</span>
+                        <span>Watching <span className="font-mono font-medium text-foreground">4</span></span>
+                        <span className="text-border">·</span>
+                        <span>In DD <span className="font-mono font-medium text-foreground">2</span></span>
+                        <span className="text-border">·</span>
+                        <span>Invested <span className="font-mono font-medium text-foreground">1</span></span>
                       </div>
                     )}
-                 </div>
+                  </div>
+                  {pipelineExpanded && (
+                    <div className="flex-1 overflow-auto p-4 relative">
+                      {currentModule === "Pipeline" ? (
+                        <div className="absolute inset-0 flex items-center justify-center text-[13px] text-muted-foreground">
+                          Pipeline is already open in main view.
+                        </div>
+                      ) : (
+                        <VCDealTracker userRole={userRole} />
+                      )}
+                    </div>
+                  )}
+                </div>
               </Panel>
             </PanelGroup>
           </Panel>
 
           {logsExpanded && (
             <>
-              <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 cursor-col-resize z-10" />
+              <PanelResizeHandle className="w-px bg-border hover:bg-accent/40 cursor-col-resize z-10" />
               <Panel defaultSize={20} minSize={15} maxSize={40}>
                 <AuditLogsPanel />
               </Panel>
@@ -185,11 +196,11 @@ const TerminalPage = () => {
 
       {/* Authentication Overlay */}
       {!authenticated && (
-        <AuthPanel 
+        <AuthPanel
           onAuthSuccess={(role: string) => {
             setAuthenticated(true);
             setUserRole(role);
-          }} 
+          }}
         />
       )}
     </div>

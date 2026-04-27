@@ -21,69 +21,69 @@ export function GlobalCommandPalette({ onSelectStartup, onSelectFounder, onSelec
         setOpen((open) => !open);
       }
     };
-
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="p-0 overflow-hidden shadow-2xl bg-background border border-border max-w-2xl">
-        <Command className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground"
+      <DialogContent className="p-0 overflow-hidden bg-card border border-border shadow-xl rounded-lg max-w-lg">
+        <Command
+          className="flex h-full w-full flex-col overflow-hidden bg-card text-foreground"
           filter={(value, search) => {
             if (value.toLowerCase().includes(search.toLowerCase())) return 1;
             return 0;
           }}
         >
           <Command.Input
-            className="flex h-11 w-full rounded-md bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-b border-border"
-            placeholder="Search startups, founders, and cities... (Cmd+K)"
+            className="flex h-12 w-full bg-transparent px-4 py-3 text-[14px] outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-b border-border"
+            placeholder="Search startups, founders, cities…"
             value={search}
             onValueChange={setSearch}
             autoFocus
           />
-          <Command.List className="max-h-[300px] overflow-y-auto overflow-x-hidden p-2">
-            <Command.Empty className="py-6 text-center text-sm">No results found.</Command.Empty>
+          <Command.List className="max-h-[320px] overflow-y-auto overflow-x-hidden p-2">
+            <Command.Empty className="py-8 text-center text-[13px] text-muted-foreground">No results found.</Command.Empty>
 
-            <Command.Group heading="Startups" className="px-2 text-xs font-medium text-muted-foreground py-2">
+            <Command.Group heading="Startups" className="[&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wide [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:mt-2">
               <Command.Item
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                className="relative flex cursor-pointer select-none items-center px-4 py-2 text-[13px] outline-none rounded-sm aria-selected:bg-primary/8 aria-selected:border-l-2 aria-selected:border-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors duration-150"
                 value="neurolink"
                 onSelect={() => {
                   setOpen(false);
                   onSelectStartup("1");
                 }}
               >
-                NeuroLink AI (AI)
+                NeuroLink AI <span className="ml-2 text-[11px] text-muted-foreground">AI/ML</span>
               </Command.Item>
               <Command.Item
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                className="relative flex cursor-pointer select-none items-center px-4 py-2 text-[13px] outline-none rounded-sm aria-selected:bg-primary/8 aria-selected:border-l-2 aria-selected:border-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors duration-150"
                 value="cropsense"
                 onSelect={() => {
                   setOpen(false);
                   onSelectStartup("2");
                 }}
               >
-                CropSense (AgTech)
+                CropSense <span className="ml-2 text-[11px] text-muted-foreground">AgTech</span>
               </Command.Item>
             </Command.Group>
 
-            <Command.Group heading="Founders" className="px-2 text-xs font-medium text-muted-foreground py-2">
+            <Command.Group heading="Founders" className="[&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wide [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:mt-2">
               <Command.Item
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                className="relative flex cursor-pointer select-none items-center px-4 py-2 text-[13px] outline-none rounded-sm aria-selected:bg-primary/8 aria-selected:border-l-2 aria-selected:border-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors duration-150"
                 value="founder-john"
                 onSelect={() => {
                   setOpen(false);
                   onSelectFounder("octocat");
                 }}
               >
-                John Doe (NeuroLink AI)
+                John Doe <span className="ml-2 text-[11px] text-muted-foreground">NeuroLink AI</span>
               </Command.Item>
             </Command.Group>
 
-            <Command.Group heading="Cities" className="px-2 text-xs font-medium text-muted-foreground py-2">
+            <Command.Group heading="Cities" className="[&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wide [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:mt-2">
               <Command.Item
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                className="relative flex cursor-pointer select-none items-center px-4 py-2 text-[13px] outline-none rounded-sm aria-selected:bg-primary/8 aria-selected:border-l-2 aria-selected:border-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors duration-150"
                 value="bangalore"
                 onSelect={() => {
                   setOpen(false);
@@ -94,6 +94,11 @@ export function GlobalCommandPalette({ onSelectStartup, onSelectFounder, onSelec
               </Command.Item>
             </Command.Group>
           </Command.List>
+          <div className="border-t border-border px-4 py-2 flex gap-4">
+            <span className="text-[11px] text-muted-foreground"><kbd className="font-mono">↑↓</kbd> navigate</span>
+            <span className="text-[11px] text-muted-foreground"><kbd className="font-mono">↵</kbd> select</span>
+            <span className="text-[11px] text-muted-foreground"><kbd className="font-mono">esc</kbd> close</span>
+          </div>
         </Command>
       </DialogContent>
     </Dialog>
