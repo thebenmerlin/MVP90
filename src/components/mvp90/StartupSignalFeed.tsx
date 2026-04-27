@@ -9,6 +9,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { RefreshCw, Download } from "lucide-react";
 
 
 interface StartupSignalFeedProps {
@@ -242,16 +243,16 @@ const StartupSignalFeed: React.FC<StartupSignalFeedProps> = ({ userRole, selecte
   }, []);
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-green-400";
-    if (score >= 6) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 8) return "text-[var(--positive)]";
+    if (score >= 6) return "text-[var(--warning)]";
+    return "text-[var(--negative)]";
   };
 
   const getActionTagColor = (tag: string) => {
     switch (tag) {
-      case "Build": return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "Scout": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "Store": return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+      case "Build": return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800";
+      case "Scout": return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800";
+      case "Store": return "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
@@ -322,65 +323,65 @@ const exportToCSV = () => {
   };
 
   return (
-    <PanelGroup direction="horizontal" className="h-full bg-background font-mono text-xs">
+    <PanelGroup direction="horizontal" className="h-full bg-background text-xs">
       <Panel defaultSize={selectedSignal ? 45 : 100} minSize={30} className="flex flex-col h-full overflow-y-auto pr-2 space-y-4 relative">
         <div className="flex items-center justify-between border-b border-border pb-2">
         <div>
-          <h2 className="text-lg font-bold uppercase tracking-wider">Startup Signal Feed</h2>
-          <p className="text-xs text-muted-foreground font-mono mt-1">
+          <h2 className="text-[22px] font-semibold tracking-tight">Startup Signal Feed</h2>
+          <p className="text-[13px] text-muted-foreground mt-1">
             Live intelligence on emerging startups
             {Object.values(apiStatus).some(Boolean) && (
-              <span className="ml-2 text-primary uppercase font-bold text-[10px] animate-pulse">[LIVE APIs Connected]</span>
+              <span className="ml-2 inline-flex items-center gap-1 text-[12px] text-emerald-700 dark:text-emerald-400"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />Live</span>
             )}
           </p>
         </div>
         <div className="flex items-center space-x-4">
           {isRefreshing && (
-            <div className="text-xs text-muted-foreground font-mono animate-pulse">REFRESHING...</div>
+            <div className="text-[12px] text-muted-foreground animate-pulse">Refreshing...</div>
           )}
           <button
             onClick={handleRefreshClick}
             disabled={isRefreshing}
-            className="text-xs text-primary font-bold uppercase hover:bg-primary/20 p-1 border border-transparent hover:border-primary disabled:opacity-50 transition-colors"
+            className="text-[13px] font-medium border border-border rounded h-8 px-3 flex items-center gap-1.5 hover:bg-muted transition-colors duration-150 disabled:opacity-50"
           >
-            [Refresh]
+            <RefreshCw className="w-3.5 h-3.5" />Refresh
           </button>
 
           <div className="relative group inline-block">
-            <button className="text-xs text-primary font-bold uppercase hover:bg-primary/20 p-1 border border-transparent hover:border-primary transition-colors">
-              [Export ▼]
+            <button className="text-[13px] font-medium border border-border rounded h-8 px-3 flex items-center gap-1.5 hover:bg-muted transition-colors duration-150">
+              <Download className="w-3.5 h-3.5" />Export
             </button>
-            <div className="absolute right-0 mt-1 w-32 bg-black border border-primary shadow-lg hidden group-hover:block z-50">
+            <div className="absolute right-0 mt-1 w-32 bg-card border border-border shadow-md hidden group-hover:block z-50">
               <button
                 onClick={exportToCSV}
-                className="w-full text-left px-4 py-2 text-xs text-primary hover:bg-primary/20 uppercase font-bold"
+                className="w-full text-left px-3 py-2 text-[13px] hover:bg-muted transition-colors"
               >
                 CSV
               </button>
               <button
                 onClick={exportToPDF}
-                className="w-full text-left px-4 py-2 text-xs text-primary hover:bg-primary/20 uppercase font-bold"
+                className="w-full text-left px-3 py-2 text-[13px] hover:bg-muted transition-colors"
               >
                 PDF
               </button>
             </div>
           </div>
-          <div className="text-xs text-muted-foreground font-mono">
+          <div className="text-[12px] text-muted-foreground font-mono">
             COUNT: {filteredAndSortedSignals.length}
           </div>
           {/* API Status Indicator */}
-          <div className="flex items-center space-x-1 border border-border p-1 bg-black">
+          <div className="flex items-center gap-1">
             {apiStatus.github && (
-              <div className="w-2 h-2 bg-green-400" title="GitHub API Connected" />
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400" title="GitHub API Connected" />
             )}
             {apiStatus.productHunt && (
-              <div className="w-2 h-2 bg-blue-400" title="Product Hunt API Connected" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-400" title="Product Hunt API Connected" />
             )}
             {apiStatus.supabase && (
-              <div className="w-2 h-2 bg-purple-400" title="Supabase Connected" />
+              <div className="w-1.5 h-1.5 rounded-full bg-purple-400" title="Supabase Connected" />
             )}
             {!apiStatus.github && !apiStatus.productHunt && !apiStatus.supabase && (
-               <div className="w-2 h-2 bg-red-500" title="No APIs Connected" />
+               <div className="w-1.5 h-1.5 rounded-full bg-red-500" title="No APIs Connected" />
             )}
           </div>
         </div>
@@ -388,35 +389,28 @@ const exportToCSV = () => {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12 border border-border bg-black/50">
-          <div className="text-center">
-            <div className="text-primary font-bold uppercase mb-2 animate-pulse">LOADING STARTUP SIGNALS...</div>
-            <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">
-              Fetching real-time data from sources
-            </div>
-          </div>
-        </div>
+        <div className="space-y-1">{Array.from({length: 8}).map((_,i) => (<div key={i} className="h-10 flex items-center gap-3 border-b border-border px-3"><div className="animate-pulse bg-muted rounded h-4 w-32" /><div className="animate-pulse bg-muted rounded h-4 w-16" /><div className="animate-pulse bg-muted rounded h-4 w-16" /><div className="animate-pulse bg-muted rounded h-4 w-8" /><div className="animate-pulse bg-muted rounded h-4 w-8" /></div>))}</div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="bg-destructive/10 border border-destructive text-destructive p-3">
-          <div className="font-bold uppercase text-xs mb-1">ERROR LOADING SIGNALS</div>
-          <div className="text-[10px] font-mono">{error}</div>
+        <div className="border-l-4 border-destructive bg-destructive/5 px-4 py-3 rounded-sm text-[13px] text-destructive">
+          <div className="font-medium mb-1">Error Loading Signals</div>
+          <div className="text-[13px]">{error}</div>
           <button
             onClick={loadStartupSignals}
-            className="mt-2 text-[10px] uppercase font-bold border border-destructive px-2 py-1 hover:bg-destructive/20 transition-colors"
+            className="mt-2 text-[13px] font-medium border border-destructive rounded px-3 py-1 hover:bg-destructive/10 transition-colors"
           >
-            [RETRY]
+            Retry
           </button>
         </div>
       )}
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <div className="bg-black border-b border-border p-3 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="bg-muted/30 border-b border-border p-3 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
           <div className="space-y-1">
-            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min Novelty (0-10)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Min Novelty (0-10)</label>
             <div className="flex items-center space-x-2">
               <input
                 type="range"
@@ -431,7 +425,7 @@ const exportToCSV = () => {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Max Cloneability (0-10)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Max Cloneability (0-10)</label>
             <div className="flex items-center space-x-2">
               <input
                 type="range"
@@ -446,7 +440,7 @@ const exportToCSV = () => {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min Thesis Fit (0-10)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Min Thesis Fit (0-10)</label>
             <div className="flex items-center space-x-2">
               <input
                 type="range"
@@ -461,17 +455,17 @@ const exportToCSV = () => {
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Min GitHub Stars</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Min GitHub Stars</label>
             <input
               type="number"
               min="0"
               value={filters.minGithubStars}
               onChange={(e) => setFilters({ ...filters, minGithubStars: parseInt(e.target.value) || 0 })}
-              className="w-full bg-transparent border border-border p-1 text-xs font-mono outline-none focus:border-primary"
+              className="w-full bg-background border border-border rounded px-2 py-1 text-[12px] font-mono focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
           <div className="space-y-1 md:col-span-2">
-            <label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Max Build Cost ($)</label>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Max Build Cost ($)</label>
             <div className="flex items-center space-x-2">
               <input
                 type="range"
@@ -492,9 +486,9 @@ const exportToCSV = () => {
                   maxCloneabilityScore: 10, minIndiaMarketFit: 0, maxEstimatedBuildCost: 10000000,
                   minGithubStars: 0, actionTag: ""
                 })}
-                className="text-[10px] text-primary border border-primary px-3 py-1.5 hover:bg-primary/20 uppercase font-bold transition-colors"
+                className="text-[12px] font-medium border border-border rounded px-3 py-1.5 hover:bg-muted transition-colors"
               >
-                [RESET ALL FILTERS]
+                Reset All Filters
               </button>
           </div>
         </div>
@@ -502,19 +496,19 @@ const exportToCSV = () => {
 
       {/* Signal List High-Density Table */}
       {!isLoading && !error && (
-        <div className="flex-1 overflow-auto border border-border">
+        <div className="flex-1 overflow-auto bg-card border border-border rounded overflow-hidden">
           <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 bg-black z-10 text-[10px] uppercase text-muted-foreground">
+            <thead className="sticky top-0 bg-muted z-10">
               <tr>
                 <th
-                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border cursor-pointer hover:bg-muted/50"
                   onClick={() => handleSort("name")}
                 >
                   Name {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
-                <th className="p-2 border-b border-r border-border">
+                <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border">
                   <select
-                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full text-[11px]"
                     value={filters.region}
                     onChange={(e) => setFilters({ ...filters, region: e.target.value })}
                   >
@@ -525,9 +519,9 @@ const exportToCSV = () => {
                     <option value="Global">GLOBAL</option>
                   </select>
                 </th>
-                <th className="p-2 border-b border-r border-border">
+                <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border">
                   <select
-                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full text-[11px]"
                     value={filters.source}
                     onChange={(e) => setFilters({ ...filters, source: e.target.value })}
                   >
@@ -539,26 +533,26 @@ const exportToCSV = () => {
                   </select>
                 </th>
                 <th
-                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border cursor-pointer hover:bg-muted/50"
                   onClick={() => handleSort("noveltyScore")}
                 >
                   NOVELTY {sortBy === "noveltyScore" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
-                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border cursor-pointer hover:bg-muted/50"
                   onClick={() => handleSort("indiaMarketFit")}
                 >
                   THESIS FIT {sortBy === "indiaMarketFit" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
-                  className="p-2 border-b border-r border-border cursor-pointer hover:bg-muted/20"
+                  className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-r border-border cursor-pointer hover:bg-muted/50"
                   onClick={() => handleSort("lastUpdated")}
                 >
                   AGE {sortBy === "lastUpdated" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
-                <th className="p-2 border-b border-border">
+                <th className="px-3 py-2.5 text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wide border-b border-border">
                   <select
-                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full"
+                    className="bg-transparent border-none outline-none text-muted-foreground uppercase cursor-pointer w-full text-[11px]"
                     value={filters.actionTag}
                     onChange={(e) => setFilters({ ...filters, actionTag: e.target.value })}
                   >
@@ -575,41 +569,41 @@ const exportToCSV = () => {
                 <tr
                   key={signal.id}
                   onClick={() => handleSelectSignal(signal)}
-                  className={`cursor-pointer transition-colors border-b border-border/50 hover:bg-muted/50 h-[32px] ${
-                    selectedSignal?.id === signal.id ? "bg-primary/20 hover:bg-primary/30" : ""
+                  className={`cursor-pointer transition-colors border-b border-border last:border-0 hover:bg-muted/30 h-10 ${
+                    selectedSignal?.id === signal.id ? "bg-primary/5 border-l-2 border-l-primary" : ""
                   }`}
                 >
-                  <td className="p-2 border-r border-border whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
-                    <span className="font-bold text-xs uppercase tracking-wide group-hover:text-primary transition-colors">
+                  <td className="px-3 py-2 border-r border-border whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
+                    <span className="text-[13px] font-semibold text-foreground">
                       {signal.name}
                     </span>
                   </td>
-                  <td className="p-2 border-r border-border whitespace-nowrap text-xs text-muted-foreground">
+                  <td className="px-3 py-2 border-r border-border whitespace-nowrap text-[12px] text-muted-foreground">
                     {signal.region}
                   </td>
-                  <td className="p-2 border-r border-border whitespace-nowrap">
+                  <td className="px-3 py-2 border-r border-border whitespace-nowrap">
                     <div className="flex items-center space-x-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold border border-border px-1">
+                      <span className="text-[11px] text-muted-foreground font-medium border border-border rounded px-1">
                         {signal.source.substring(0, 2)}
                       </span>
                       {signal.realTimeData && (
-                        <span className="text-[10px] text-primary font-bold uppercase border border-primary px-1 animate-pulse">LIVE</span>
+                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />Live</span>
                       )}
                     </div>
                   </td>
-                  <td className={`p-2 border-r border-border text-xs font-mono transition-colors duration-1000 ${
-                    blinkingSignals[signal.id] === 'noveltyScore' ? 'bg-primary/20' : ''
+                  <td className={`px-3 py-2 border-r border-border text-[12px] font-mono font-medium transition-colors duration-1000 ${
+                    blinkingSignals[signal.id] === 'noveltyScore' ? 'ring-1 ring-accent/50' : ''
                   }`}>
                     <span className={getScoreColor(signal.noveltyScore)}>{signal.noveltyScore.toFixed(1)}</span>
                   </td>
-                  <td className="p-2 border-r border-border text-xs font-mono">
+                  <td className="px-3 py-2 border-r border-border text-[12px] font-mono font-medium">
                     <span className={getScoreColor(signal.indiaMarketFit)}>{signal.indiaMarketFit.toFixed(1)}</span>
                   </td>
-                  <td className="p-2 border-r border-border text-xs text-muted-foreground whitespace-nowrap">
+                  <td className="px-3 py-2 border-r border-border text-[12px] text-muted-foreground whitespace-nowrap">
                     {signal.lastUpdated.split(',')[0]}
                   </td>
-                  <td className="p-2">
-                    <span className={`px-1 py-0.5 text-[10px] font-bold uppercase border whitespace-nowrap ${getActionTagColor(signal.actionTag)}`}>
+                  <td className="px-3 py-2">
+                    <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full border whitespace-nowrap ${getActionTagColor(signal.actionTag)}`}>
                       {signal.actionTag}
                     </span>
                   </td>
@@ -621,17 +615,18 @@ const exportToCSV = () => {
       )}
 
       {filteredAndSortedSignals.length === 0 && (
-        <div className="text-center py-12 border border-border bg-black/50">
-          <div className="text-muted-foreground text-xs uppercase font-bold mb-2">No signals match your filters</div>
+        <div className="text-center py-12 border border-border rounded bg-card">
+          <div className="text-[15px] font-medium mb-1">No signals match your filters</div>
+          <div className="text-[13px] text-muted-foreground mb-3">Try adjusting your filter criteria</div>
           <button
             onClick={() => setFilters({
               industry: "", region: "", source: "", minNoveltyScore: 0,
               maxCloneabilityScore: 10, minIndiaMarketFit: 0, maxEstimatedBuildCost: 10000000,
               minGithubStars: 0, actionTag: ""
             })}
-            className="text-[10px] text-primary border border-primary px-2 py-1 hover:bg-primary/20 uppercase font-bold transition-colors"
+            className="text-[13px] font-medium border border-border rounded px-3 py-1.5 hover:bg-muted transition-colors"
           >
-            [CLEAR FILTERS]
+            Clear Filters
           </button>
         </div>
       )}
@@ -647,9 +642,7 @@ const exportToCSV = () => {
 
       {selectedSignal && (
         <>
-          <PanelResizeHandle className="w-1 bg-border hover:bg-primary cursor-col-resize transition-colors flex items-center justify-center z-10 mx-2">
-            <div className="h-10 w-0.5 bg-primary/50 pointer-events-none" />
-          </PanelResizeHandle>
+          <PanelResizeHandle className="w-px bg-border hover:bg-accent/40 cursor-col-resize transition-colors mx-1" />
 
           <Panel defaultSize={55} minSize={40} className="h-full bg-background overflow-y-auto flex flex-col pl-2">
             <StartupProfileView

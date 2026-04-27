@@ -8,6 +8,7 @@ import RawSignalBreakdownModal from "./RawSignalBreakdownModal";
 import ScoreExplainerModal from "./ScoreExplainerModal";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { X } from "lucide-react";
 
 
 interface StartupSignal {
@@ -49,16 +50,16 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
   const [selectedScore, setSelectedScore] = useState<{name: string, value: number}>({name: '', value: 0});
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-green-400";
-    if (score >= 6) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 8) return "text-[var(--positive)]";
+    if (score >= 6) return "text-[var(--warning)]";
+    return "text-[var(--negative)]";
   };
 
   const getActionTagColor = (tag: string) => {
     switch (tag) {
-      case "Build": return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "Scout": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "Store": return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+      case "Build": return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800";
+      case "Scout": return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800";
+      case "Store": return "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
   };
@@ -163,13 +164,13 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
   ];
 
   const content = (
-    <div className={`bg-card w-full flex flex-col font-mono ${isPanel ? 'h-full border-l border-border' : 'border border-border rounded-lg w-4/5 max-w-4xl h-4/5 shadow-2xl'}`}>
+    <div className={`bg-card w-full flex flex-col ${isPanel ? 'h-full border-l border-border' : 'border border-border rounded-lg w-4/5 max-w-4xl h-4/5 shadow-xl'}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/20">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center space-x-4">
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-2xl font-bold">{startup.name}</h2>
+                <h2 className="text-[20px] font-semibold">{startup.name}</h2>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -187,34 +188,34 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <p className="text-muted-foreground">{startup.industry} • {startup.region}</p>
+              <div className="flex items-center gap-1.5 mt-1"><span className="px-2 py-0.5 text-[11px] rounded-full bg-muted text-muted-foreground">{startup.industry}</span><span className="px-2 py-0.5 text-[11px] rounded-full bg-muted text-muted-foreground">{startup.region}</span></div>
             </div>
-            <span className={`px-3 py-1 rounded text-sm border ${getActionTagColor(startup.actionTag)}`}>
+            <span className={`px-2 py-0.5 rounded text-[11px] font-medium border ${getActionTagColor(startup.actionTag)}`}>
               {startup.actionTag}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={exportStartupToPDF}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors"
+              className="h-8 px-3 text-[13px] font-medium rounded border border-border hover:bg-muted transition-colors"
             >
               Export PDF
             </button>
             <button
               onClick={handleSaveToWatchlist}
-              className={`px-4 py-2 rounded text-sm transition-colors ${
+              className={`h-8 px-3 text-[13px] font-medium rounded border border-border transition-colors ${
                 savedToWatchlist 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  ? "bg-primary text-primary-foreground border-primary" 
+                  : "hover:bg-muted"
               }`}
             >
               {savedToWatchlist ? "Saved" : "Save to Watchlist"}
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded text-sm hover:bg-secondary/80 transition-colors"
+              className="h-8 px-3 text-[13px] font-medium rounded border border-border hover:bg-muted transition-colors"
             >
-              Close
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -225,7 +226,7 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-6 py-3 text-sm font-medium transition-colors ${
+              className={`px-4 py-2.5 text-[13px] font-medium transition-colors ${
                 activeTab === tab.key
                   ? "border-b-2 border-primary text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -237,7 +238,7 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 p-5 overflow-y-auto">
           {activeTab === "score_explainer" && selectedScore.name && (
             <div className="space-y-6">
               <button onClick={() => setActiveTab("scoring")} className="mb-4 text-xs text-muted-foreground hover:text-foreground">← Back to Scoring</button>
@@ -266,22 +267,22 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-2">Pitch</h3>
-                <p className="text-muted-foreground">{startup.pitch}</p>
+                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pitch</h3>
+                <p className="leading-relaxed text-[13px]">{startup.pitch}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Team</h3>
-                  <p className="text-muted-foreground mb-2">{startup.team}</p>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Team</h3>
+                  <p className="text-[13px] text-muted-foreground mb-2">{startup.team}</p>
                   <div className="text-sm">
                     <span className="font-medium">Founder Background:</span>
-                    <p className="text-muted-foreground mt-1">{startup.founderBackground}</p>
+                    <p className="text-[13px] text-muted-foreground mt-1">{startup.founderBackground}</p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Key Metrics</h3>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Key Metrics</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Source:</span>
@@ -303,16 +304,16 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
           {activeTab === "scoring" && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Scoring Breakdown</h3>
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Scoring Breakdown</h3>
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/30 p-4 rounded border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="font-medium cursor-help">Novelty Score</span>
+                            <span className="text-[12px] font-medium cursor-help">Novelty Score</span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">Originality: Measures uniqueness and innovation level</p>
@@ -321,28 +322,28 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                       </TooltipProvider>
                       <button
                         onClick={() => handleScoreClick('originality_score', startup.noveltyScore)}
-                        className={`text-xl font-bold ${getScoreColor(startup.noveltyScore)} hover:underline cursor-pointer`}
+                        className={`text-[18px] font-mono font-medium ${getScoreColor(startup.noveltyScore)} hover:underline cursor-pointer`}
                       >
                         {startup.noveltyScore}/10
                       </button>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
+                    <div className="h-1 bg-muted rounded-full">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all"
+                        className="bg-primary h-1 rounded-full transition-all"
                         style={{ width: `${startup.noveltyScore * 10}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <p className="text-[12px] text-muted-foreground mt-2">
                       Measures how unique and innovative the startup idea is
                     </p>
                   </div>
 
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/30 p-4 rounded border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="font-medium cursor-help">Cloneability Score</span>
+                            <span className="text-[12px] font-medium cursor-help">Cloneability Score</span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">Replicability: Technical barriers and competitive moat strength</p>
@@ -351,30 +352,30 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                       </TooltipProvider>
                       <button
                         onClick={() => handleScoreClick('replicability_score', startup.cloneabilityScore)}
-                        className={`text-xl font-bold ${getScoreColor(10 - startup.cloneabilityScore)} hover:underline cursor-pointer`}
+                        className={`text-[18px] font-mono font-medium ${getScoreColor(10 - startup.cloneabilityScore)} hover:underline cursor-pointer`}
                       >
                         {startup.cloneabilityScore}/10
                       </button>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
+                    <div className="h-1 bg-muted rounded-full">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all"
+                        className="bg-primary h-1 rounded-full transition-all"
                         style={{ width: `${startup.cloneabilityScore * 10}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <p className="text-[12px] text-muted-foreground mt-2">
                       How easily competitors can replicate this solution (lower is better)
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/30 p-4 rounded border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="font-medium cursor-help">India Market Fit</span>
+                            <span className="text-[12px] font-medium cursor-help">India Market Fit</span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">Market Fit: Potential for success in Indian market conditions</p>
@@ -383,28 +384,28 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                       </TooltipProvider>
                       <button
                         onClick={() => handleScoreClick('india_fit_score', startup.indiaMarketFit)}
-                        className={`text-xl font-bold ${getScoreColor(startup.indiaMarketFit)} hover:underline cursor-pointer`}
+                        className={`text-[18px] font-mono font-medium ${getScoreColor(startup.indiaMarketFit)} hover:underline cursor-pointer`}
                       >
                         {startup.indiaMarketFit}/10
                       </button>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
+                    <div className="h-1 bg-muted rounded-full">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all"
+                        className="bg-primary h-1 rounded-full transition-all"
                         style={{ width: `${startup.indiaMarketFit * 10}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <p className="text-[12px] text-muted-foreground mt-2">
                       Potential for success in the Indian market
                     </p>
                   </div>
 
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/30 p-4 rounded border border-border">
                     <div className="flex justify-between items-center mb-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="font-medium cursor-help">Build Cost Efficiency</span>
+                            <span className="text-[12px] font-medium cursor-help">Build Cost Efficiency</span>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">Build Cost: Estimated capital required for MVP development</p>
@@ -413,12 +414,12 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                       </TooltipProvider>
                       <button
                         onClick={() => handleScoreClick('build_cost_estimate', startup.estimatedBuildCost)}
-                        className="text-xl font-bold text-blue-400 hover:underline cursor-pointer"
+                        className="text-[18px] font-mono font-medium text-accent hover:underline cursor-pointer"
                       >
                         ${(startup.estimatedBuildCost / 1000).toFixed(0)}K
                       </button>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
+                    <p className="text-[12px] text-muted-foreground mt-2">
                       Estimated cost to build a minimum viable product
                     </p>
                   </div>
@@ -427,12 +428,12 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
               {/* MVP90 Overall Score & Radar Chart */}
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-muted/50 p-4 rounded-lg flex flex-col justify-center">
+                <div className="bg-muted/30 p-4 rounded border border-border flex flex-col justify-center">
                   <div className="flex justify-between items-center mb-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="font-medium cursor-help">MVP90 Overall Score</span>
+                          <span className="text-[12px] font-medium cursor-help">MVP90 Overall Score</span>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-xs">Composite score combining all factors with weighted importance</p>
@@ -441,14 +442,14 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                     </TooltipProvider>
                     <button
                       onClick={() => handleScoreClick('mvp90_overall_score', (startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)}
-                      className={`text-2xl font-bold ${getScoreColor((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)} hover:underline cursor-pointer`}
+                      className={`text-[22px] font-mono font-semibold ${getScoreColor((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3)} hover:underline cursor-pointer`}
                     >
                       {((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3).toFixed(1)}/10
                     </button>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-3 mb-4">
+                  <div className="h-1 bg-muted rounded-full mb-4">
                     <div
-                      className="bg-gradient-to-r from-primary to-green-400 h-3 rounded-full transition-all"
+                      className="bg-primary h-1 rounded-full transition-all"
                       style={{ width: `${((startup.noveltyScore + (10 - startup.cloneabilityScore) + startup.indiaMarketFit) / 3) * 10}%` }}
                     ></div>
                   </div>
@@ -457,13 +458,13 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                   </p>
                 </div>
 
-                <div className="bg-muted/50 p-4 rounded-lg h-64 flex items-center justify-center">
+                <div className="bg-muted/30 p-4 rounded border border-border h-64 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
                       <PolarGrid stroke="#333" />
                       <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 12 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fill: '#666', fontSize: 10 }} />
-                      <Radar name="Startup Profile" dataKey="A" stroke="#00ff88" fill="#00ff88" fillOpacity={0.4} />
+                      <Radar name="Startup Profile" dataKey="A" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.4} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
@@ -473,42 +474,42 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
           {activeTab === "traction" && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Traction Signals</h3>
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Traction Signals</h3>
               
               <div className="grid grid-cols-3 gap-6">
-                <div className="bg-muted/50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-primary mb-2">
+                <div className="bg-muted/30 p-4 rounded border border-border text-center">
+                  <div className="text-[24px] font-mono font-semibold text-foreground mb-1">
                     {startup.tractionSignals.githubStars.toLocaleString()}
                   </div>
-                  <div className="text-sm font-medium mb-1">GitHub Stars</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-[13px] font-medium mb-1">GitHub Stars</div>
+                  <div className="text-[11px] text-muted-foreground">
                     Developer interest and code quality indicator
                   </div>
                 </div>
 
-                <div className="bg-muted/50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-400 mb-2">
+                <div className="bg-muted/30 p-4 rounded border border-border text-center">
+                  <div className="text-[24px] font-mono font-semibold text-foreground mb-1">
                     {startup.tractionSignals.twitterFollowers.toLocaleString()}
                   </div>
-                  <div className="text-sm font-medium mb-1">Twitter Followers</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-[13px] font-medium mb-1">Twitter Followers</div>
+                  <div className="text-[11px] text-muted-foreground">
                     Social media presence and community building
                   </div>
                 </div>
 
-                <div className="bg-muted/50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-purple-400 mb-2">
+                <div className="bg-muted/30 p-4 rounded border border-border text-center">
+                  <div className="text-[24px] font-mono font-semibold text-foreground mb-1">
                     {startup.tractionSignals.substackPosts}
                   </div>
-                  <div className="text-sm font-medium mb-1">Substack Posts</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-[13px] font-medium mb-1">Substack Posts</div>
+                  <div className="text-[11px] text-muted-foreground">
                     Thought leadership and content creation
                   </div>
                 </div>
               </div>
 
               {/* Traction Time-Series Chart */}
-              <div className="bg-muted/50 p-4 rounded-lg">
+              <div className="bg-muted/30 p-4 rounded border border-border">
                 <h4 className="font-medium mb-4">Historical Traction (Last 6 Months)</h4>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -525,30 +526,29 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                     >
                       <defs>
                         <linearGradient id="colorGithub" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#00ff88" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#00ff88" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                         </linearGradient>
                         <linearGradient id="colorTwitter" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
                           <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                       <XAxis dataKey="month" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
                       <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
                       <RechartsTooltip
-                        contentStyle={{ backgroundColor: '#1a1a1a', borderColor: '#333', borderRadius: '4px' }}
+                        contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '4px' }}
                         itemStyle={{ color: '#fff' }}
                       />
-                      <Area type="monotone" dataKey="github" name="GitHub Stars" stroke="#00ff88" fillOpacity={1} fill="url(#colorGithub)" />
+                      <Area type="monotone" dataKey="github" name="GitHub Stars" stroke="#2563eb" fillOpacity={1} fill="url(#colorGithub)" />
                       <Area type="monotone" dataKey="twitter" name="Twitter Followers" stroke="#3b82f6" fillOpacity={1} fill="url(#colorTwitter)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Traction Analysis</h4>
+              <div className="bg-muted/30 p-4 rounded border border-border">
                 <p className="text-sm text-muted-foreground">
                   Based on the traction signals, this startup shows {
                     startup.tractionSignals.githubStars > 1000 ? "strong" : 
@@ -567,33 +567,33 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
           {activeTab === "analysis" && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Investment Analysis</h3>
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Investment Analysis</h3>
               
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-medium mb-3 text-green-400">Strengths</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Strengths</h4>
                   <ul className="space-y-2 text-sm">
                     {startup.noveltyScore >= 7 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-green-400 mt-1">•</span>
+                        <span className="text-[var(--positive)] mt-1">•</span>
                         <span>High novelty score indicates innovative approach</span>
                       </li>
                     )}
                     {startup.cloneabilityScore <= 4 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-green-400 mt-1">•</span>
+                        <span className="text-[var(--positive)] mt-1">•</span>
                         <span>Low cloneability suggests defensible moat</span>
                       </li>
                     )}
                     {startup.indiaMarketFit >= 7 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-green-400 mt-1">•</span>
+                        <span className="text-[var(--positive)] mt-1">•</span>
                         <span>Strong India market fit for local expansion</span>
                       </li>
                     )}
                     {startup.estimatedBuildCost < 100000 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-green-400 mt-1">•</span>
+                        <span className="text-[var(--positive)] mt-1">•</span>
                         <span>Relatively low build cost for quick MVP</span>
                       </li>
                     )}
@@ -601,29 +601,29 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-3 text-red-400">Risks</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Risks</h4>
                   <ul className="space-y-2 text-sm">
                     {startup.noveltyScore < 6 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-red-400 mt-1">•</span>
+                        <span className="text-[var(--negative)] mt-1">•</span>
                         <span>Lower novelty may indicate crowded market</span>
                       </li>
                     )}
                     {startup.cloneabilityScore >= 7 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-red-400 mt-1">•</span>
+                        <span className="text-[var(--negative)] mt-1">•</span>
                         <span>High cloneability risk from competitors</span>
                       </li>
                     )}
                     {startup.indiaMarketFit < 6 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-red-400 mt-1">•</span>
+                        <span className="text-[var(--negative)] mt-1">•</span>
                         <span>Limited India market fit may affect local success</span>
                       </li>
                     )}
                     {startup.estimatedBuildCost > 200000 && (
                       <li className="flex items-start space-x-2">
-                        <span className="text-red-400 mt-1">•</span>
+                        <span className="text-[var(--negative)] mt-1">•</span>
                         <span>High build cost requires significant initial investment</span>
                       </li>
                     )}
@@ -633,15 +633,15 @@ const StartupProfileView: React.FC<StartupProfileViewProps> = ({ startup, onClos
 
               {userRole === "Admin" || userRole === "Analyst" ? (
                 <div>
-                  <h4 className="font-medium mb-3">Analyst Notes</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">Analyst Notes</h4>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add your analysis notes here..."
-                    className="w-full p-3 rounded border border-border bg-input text-foreground resize-none"
+                    className="w-full p-3 rounded border border-border bg-input text-[13px] focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                     rows={4}
                   />
-                  <button className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded text-sm hover:bg-primary/90 transition-colors">
+                  <button className="mt-2 h-8 px-3 text-[13px] font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors">
                     Save Notes
                   </button>
                 </div>
