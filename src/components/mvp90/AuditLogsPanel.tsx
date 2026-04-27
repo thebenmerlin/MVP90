@@ -29,7 +29,6 @@ export const AuditLogsPanel: React.FC = () => {
   const [logs, setLogs] = useState<LogEvent[]>(initialLogs);
 
   useEffect(() => {
-    // Simulate incoming logs
     const interval = setInterval(() => {
       const randomMsg = newLogMessages[Math.floor(Math.random() * newLogMessages.length)];
       const newLog: LogEvent = {
@@ -38,46 +37,38 @@ export const AuditLogsPanel: React.FC = () => {
         type: randomMsg.type,
         message: randomMsg.message,
       };
-
-      setLogs((prevLogs) => [newLog, ...prevLogs].slice(0, 100)); // Keep last 100 logs
+      setLogs((prevLogs) => [newLog, ...prevLogs].slice(0, 100));
     }, 8000);
-
     return () => clearInterval(interval);
   }, []);
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "system": return "text-purple-400";
-      case "api": return "text-blue-400";
-      case "user": return "text-green-400";
+      case "system": return "text-purple-600 dark:text-purple-400";
+      case "api": return "text-blue-600 dark:text-blue-400";
+      case "user": return "text-emerald-700 dark:text-emerald-400";
       default: return "text-muted-foreground";
     }
   };
 
   return (
-    <div className="h-full flex flex-col bg-card border-l border-border transition-all">
-      <div className="flex items-center justify-between px-4 py-2 bg-muted/20 border-b border-border">
-        <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
-          AUDIT LOGS
-        </div>
-        <div className="text-[10px] text-muted-foreground font-mono">
-          {logs.length} EVENTS
-        </div>
+    <div className="h-full flex flex-col bg-card border-l border-border">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border">
+        <span className="text-[13px] font-medium text-foreground">Audit Logs</span>
+        <span className="text-[11px] text-muted-foreground font-mono">{logs.length} events</span>
       </div>
-      <div className="flex-1 overflow-auto p-4 space-y-3 font-mono text-xs">
+      <div className="flex-1 overflow-auto p-3 space-y-2.5">
         {logs.map((log) => (
-          <div key={log.id} className="border-b border-border/30 pb-2 last:border-0 last:pb-0">
-            <div className="flex justify-between items-start mb-1">
-              <span className={`uppercase font-bold text-[10px] ${getTypeColor(log.type)}`}>
+          <div key={log.id} className="border-b border-border/40 pb-2 last:border-0 last:pb-0">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className={`text-[11px] font-mono font-medium ${getTypeColor(log.type)}`}>
                 [{log.type}]
               </span>
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground font-mono">
                 {log.timestamp.toLocaleTimeString()}
               </span>
             </div>
-            <div className="text-foreground">
-              {log.message}
-            </div>
+            <div className="text-[11px] font-mono text-foreground">{log.message}</div>
           </div>
         ))}
       </div>
