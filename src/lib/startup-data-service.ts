@@ -251,17 +251,16 @@ export class StartupDataService {
   private readonly CACHE_DURATION = 5 * 60 * 1000;
 
   async getStartupSignals(): Promise<StartupSignal[]> {
-    const signals: StartupSignal[] = [];
-    
-    for (const config of startupConfigs) {
-      try {
-        const signal = await this.getEnhancedStartupData(config);
-        signals.push(signal);
-      } catch (error) {
-        console.error(`Error fetching data for ${config.name}:`, error);
-        signals.push(this.createFallbackSignal(config));
-      }
-    }
+    const signals = await Promise.all(
+      startupConfigs.map(async (config) => {
+        try {
+          return await this.getEnhancedStartupData(config);
+        } catch (error) {
+          console.error(`Error fetching data for ${config.name}:`, error);
+          return this.createFallbackSignal(config);
+        }
+      })
+    );
     
     return signals;
   }
