@@ -160,6 +160,18 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
   const [sortBy, setSortBy] = useState<"date" | "roundSize" | "valuation">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  const parsedDealsData = useMemo(() => {
+    const map = new Map<number, { date: number; roundSize: number; valuation: number }>();
+    for (const deal of deals) {
+      map.set(deal.id, {
+        date: new Date(deal.date).getTime(),
+        roundSize: parseFloat(deal.roundSize.replace(/[$M]/g, "")),
+        valuation: parseFloat(deal.valuation.replace(/[$M]/g, ""))
+      });
+    }
+    return map;
+  }, [deals]);
+
   useEffect(() => {
     let filtered = deals.filter(deal => 
       (!filters.geography || deal.geography === filters.geography) &&
@@ -185,36 +197,42 @@ const VCDealTracker: React.FC<VCDealTrackerProps> = ({ userRole }) => {
           break;
       }
       
-      filtered = filtered.filter(deal => new Date(deal.date) >= filterDate);
+      const filterTime = filterDate.getTime();
+      filtered = filtered.filter(deal => {
+        const parsed = parsedDealsData.get(deal.id);
+        return parsed ? parsed.date >= filterTime : false;
+      });
     }
 
     // Sorting
     filtered.sort((a, b) => {
-      let aValue, bValue;
+      const parsedA = parsedDealsData.get(a.id);
+      const parsedB = parsedDealsData.get(b.id);
       
-      switch (sortBy) {
-        case "date":
-          aValue = new Date(a.date).getTime();
-          bValue = new Date(b.date).getTime();
-          break;
-        case "roundSize":
-          aValue = parseFloat(a.roundSize.replace(/[$M]/g, ""));
-          bValue = parseFloat(b.roundSize.replace(/[$M]/g, ""));
-          break;
-        case "valuation":
-          aValue = parseFloat(a.valuation.replace(/[$M]/g, ""));
-          bValue = parseFloat(b.valuation.replace(/[$M]/g, ""));
-          break;
-        default:
-          aValue = 0;
-          bValue = 0;
+      let aValue = 0, bValue = 0;
+
+      if (parsedA && parsedB) {
+        switch (sortBy) {
+          case "date":
+            aValue = parsedA.date;
+            bValue = parsedB.date;
+            break;
+          case "roundSize":
+            aValue = parsedA.roundSize;
+            bValue = parsedB.roundSize;
+            break;
+          case "valuation":
+            aValue = parsedA.valuation;
+            bValue = parsedB.valuation;
+            break;
+        }
       }
       
       return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
     });
 
     setFilteredDeals(filtered);
-  }, [deals, filters, sortBy, sortOrder]);
+  }, [deals, filters, sortBy, sortOrder, parsedDealsData]);
 
   const getConfidenceColor = (confidence: string) => {
     switch (confidence) {
